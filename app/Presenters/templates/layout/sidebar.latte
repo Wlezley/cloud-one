@@ -1,0 +1,24 @@
+				<div class="sidebar">
+					<div class="sidebar-header">
+						<a href="{link Homepage:}">
+						<img src="{$basePath}/img/logo.png" class="logo" alt="ZetServer CLOUD" title="ZetServer CLOUD" style="display: block; margin: 15px auto; max-width: 100%;">
+						</a>
+					</div>
+					<div class="list-group sidebar-list" id="mainmenu">
+						<!-- FILES -->
+						<a href="{link Files:}" n:class="list-group-item, $presenter->name =='Files' ? active"><i class="sidebar-icons fa fa-folder"></i>Všechny soubory</a>
+						<a href="{link Files:}" n:class="list-group-item, $presenter->name =='Files' ? a-ctive"><i class="sidebar-icons fa fa-star"></i>Oblíbené</a>
+						<a href="{link Files:}" n:class="list-group-item, $presenter->name =='Files' ? a-ctive"><i class="sidebar-icons fa fa-share-alt"></i>Sdíleno s vámi</a>
+						<a href="{link Files:}" n:class="list-group-item, $presenter->name =='Files' ? a-ctive"><i class="sidebar-icons fa fa-share-alt"></i>Sdíleno s ostatními</a>
+						<a href="{link Files:}" n:class="list-group-item, $presenter->name =='Files' ? a-ctive"><i class="sidebar-icons fa fa-link"></i>Sdíleno pomocí odkazu</a>
+
+						<!-- PERMISSIONS -->
+						<a href="{link Permissions:}" n:class="list-group-item, $presenter->name =='Permissions' ? active"><i class="sidebar-icons fa fa-users"></i>Oprávnění uživatelů</a>
+
+						<!-- SETTINGS -->
+						<a href="{link Settings:}" n:class="list-group-item, $presenter->name =='Settings' ? active"><i class="sidebar-icons fa fa-cloud"></i>Nastavení cloudu</a>
+
+						<!-- LOGOUT -->
+						<a href="{link Homepage:logout}" class="list-group-item"><i class="sidebar-icons fa fa-sign-out-alt"></i>ODHLÁSIT</a>
+					</div>
+				</div>

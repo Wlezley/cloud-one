@@ -1,0 +1,13 @@
+############################################
+# I HAVE BEEN LOCKED BY MY MASTER LISHACK.CZ
+# IF IT NECCESARY TO MODIFY ME, PLEASE USE
+# FOLLOWING COMMAND:   chattr -i ./.htaccess
+############################################
+
+
+#Order Allow,Deny
+
+#Allow from 127.0.0.0/24
+#Allow from 192.168.90.0/24
+
+Deny from All

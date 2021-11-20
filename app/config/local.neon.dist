@@ -1,0 +1,6 @@
+parameters:
+	database:
+		host: '127.0.0.1'
+		dbmane: ''
+		user: ''
+		password: ''

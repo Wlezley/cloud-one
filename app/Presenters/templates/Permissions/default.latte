@@ -1,0 +1,42 @@
+{block title}Uživatelská oprávnění{/block}
+
+{*block head}
+{include parent}
+{/block*}
+
+{block content}
+	<div id="banner">
+		<h1>{include title|striptags}</h1>
+	</div>
+
+	<h2>Seznam uživatelů</h2>
+
+	<div id="content">
+		{include '../layout/alerts.latte'}
+	</div>
+
+	<div class="row col-lg-12">
+		<table class="table">
+			<tr>
+				<th>#</th>
+				<th>Login</th>
+				<th>Jméno</th>
+				<th>E-Mail</th>
+				<th>Telefon</th>
+				<th>Role</th>
+				<th>Kvóta</th>
+			</tr>
+		{foreach $seznamUzivatelu as $uzivatel}
+			<tr>
+				<td>{$uzivatel['id']}</td>
+				<td>{$uzivatel['username']}</td>
+				<td>{$uzivatel['fullname']}</td>
+				<td>{$uzivatel['email']}</td>
+				<td>{$uzivatel['telefon']|substr:0:3}&nbsp;{$uzivatel['telefon']|substr:3:3}&nbsp;{$uzivatel['telefon']|substr:6:3}</td>
+				<td>{$uzivatel['role']}</td>
+				<td>10 GB</td>
+			</tr>
+		{/foreach}
+		</table>
+	</div>
+{/block}

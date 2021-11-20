@@ -1,0 +1,54 @@
+php:
+	date.timezone: Europe/Prague 
+
+
+application:
+	errorPresenter: Error
+	mapping:
+		*: App\*Module\Presenters\*Presenter
+
+
+session:
+	autoStart: true
+	expiration: 14 days
+	debugger: false
+
+
+di:
+	export:
+		parameters: no
+		tags: no
+
+
+database:
+	dsn: 'mysql:host=%database.host%;dbname=%database.dbmane%'
+	user: %database.user%
+	password: %database.password%
+
+
+services:
+	# Model
+	- App\Model\HistoryLog\HistoryLog
+	- App\Model\SmsBrana\SmsBrana
+
+	# Forms
+	- App\Forms\SignInFormFactory
+
+	latte.latteFactory:
+		setup:
+			- setTempDirectory(null)
+
+	router: App\Router\RouterFactory::createRouter
+	authenticator: App\Model\User\Authenticator
+
+extensions:
+	dropzone: Oli\Form\DropzoneUploaderExtension
+
+dropzone:
+	wwwDir: 'data'
+	path: 'data'
+	settings:
+		maxFiles: 50
+		fileSizeLimit: 5000000000
+		ajax: true
+		onSuccess: 'this'

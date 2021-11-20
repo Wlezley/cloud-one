@@ -1,0 +1,4 @@
+<div n:foreach="$flashes as $flash" class="alert alert-{$flash->type}" style="margin-bottom: 5px;">
+    {$flash->message|noescape}
+    {*$flash->message*}
+</div>

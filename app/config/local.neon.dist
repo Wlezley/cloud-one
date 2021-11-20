@@ -4,3 +4,6 @@ parameters:
 		dbmane: ''
 		user: ''
 		password: ''
+
+	cron:
+		hash: ''

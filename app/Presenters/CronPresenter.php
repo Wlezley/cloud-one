@@ -15,35 +15,29 @@ class CronPresenter extends BasePresenter
 	/** @var Nette\Database\Context */
 	protected $database;
 
-	/** @var Model\SmsBrana\SmsBrana */
-	protected $smsBrana;
-
 	/** @var Model\HistoryLog\HistoryLog */
 	protected $historyLog;
 
-	public function __construct(Context $database)
+	/** @var string */
+	private string $hash;
+
+	public function __construct(/*string $hash,*/ Context $database)
 	{
 		// Disable Tracy Debug Bar
 		Debugger::$showBar = false;
 
 		$this->database = $database;
-		$this->smsBrana = new Model\SmsBrana\SmsBrana($this->database);
+		//$this->hash = $hash;
 		$this->historyLog = new Model\HistoryLog\HistoryLog($this->database);
+		$this->terminate();
 	}
 
 	public function actionDefault($hash)
 	{
-		if ($hash == '1aerg6384areg651dfb8atr468hzz4ar6t84t541')
+		if ($this->hash == $hash)
 		{
-			$this->dotyApi->DB_UpdateCategories();
-			$this->historyLog->log_UpdateCron("CRON/DB_UpdateCategories");
-			//sleep(5);
-			$this->dotyApi->DB_UpdateServices();
-			$this->historyLog->log_UpdateCron("CRON/DB_UpdateServices");
-			//sleep(5);
-
-			// TEST SMS
-			//$this->smsBrana->sendSMS('608284446', 'TEST 123.', 0);
+			echo "OK!";
 		}
+		$this->terminate();
 	}
 }

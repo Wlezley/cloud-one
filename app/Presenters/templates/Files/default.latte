@@ -2,7 +2,7 @@
 
 {block head}
 {include parent}
-	<link rel="stylesheet" type="text/css" href="{$basePath}/libs/dropzone-5.7.0/dist/dropzone.css">
+	<link rel="stylesheet" type="text/css" href="{$baseUrl}/libs/dropzone-5.7.0/dist/dropzone.css">
 {/block}
 
 {block content}
@@ -81,8 +81,8 @@
 
 {block scripts}
 {include parent}
-	<script src="{$basePath}/libs/dropzone-5.7.0/dist/dropzone.js?v=21092901"></script>
-	<script src="{$basePath}/libs/dropzone-uploader/dropzoneUploader.js?v=21092901"></script>
+	<script src="{$baseUrl}/libs/dropzone-5.7.0/dist/dropzone.js?v=21092901"></script>
+	<script src="{$baseUrl}/libs/dropzone-uploader/dropzoneUploader.js?v=21092901"></script>
 	<script>
 	jQuery(document).ready(function($) {
 		$(".clickable-row").click(function() {

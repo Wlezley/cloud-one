@@ -27,6 +27,7 @@ final class RouterFactory
 		$router->addRoute('files', 'Files:default');
 		$router->addRoute('download[/<storageID>/<downloadID>]', 'Files:download');
 		$router->addRoute('delete[/<storageID>]', 'Files:delete');
+		$router->addRoute('delete-bulk[/<storageID_List>]', 'Files:deleteBulk');
 		//$router->addRoute('user-folder[/<userid>]', 'Files:userfolder');
 
 		// UPLOAD

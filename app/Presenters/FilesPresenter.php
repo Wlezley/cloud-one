@@ -37,8 +37,6 @@ final class FilesPresenter extends SecuredPresenter
 		parent::startup();
 	}
 
-	// ############################################################################################
-
 	/** Vygeneruje nahodny alfa-numericky kod
 	 * @todo Presunout do MODELU!
 	 * @param	integer			$size
@@ -67,8 +65,6 @@ final class FilesPresenter extends SecuredPresenter
 
 		return ($counter == $limit) ? str_repeat('f', $size) : $randomCode;
 	}
-
-	// ############################################################################################
 
 	public function createComponentUploader()
 	{
@@ -106,8 +102,6 @@ final class FilesPresenter extends SecuredPresenter
 		return $dropzone;
 	}
 
-	// ############################################################################################
-
 	public function renderDefault()
 	{
 		$this->template->fileList = NULL;
@@ -136,8 +130,6 @@ final class FilesPresenter extends SecuredPresenter
 			}
 		}
 	}
-
-	// ############################################################################################
 
 	public function actionDownload($storageID, $downloadID)
 	{
@@ -181,8 +173,6 @@ final class FilesPresenter extends SecuredPresenter
 
 		$this->redirect('Files:default');
 	}
-
-	// ############################################################################################
 
 	public function actionDelete($storageID)
 	{
@@ -228,6 +218,70 @@ final class FilesPresenter extends SecuredPresenter
 		$this->redirect('Files:default');
 	}
 
-	// ############################################################################################
+	/** Deletes files based on the JSON storage id field 
+	 * @todo 			Optimize!!!
+	 * @param	string	JSON contains storage IDs
+	 * @return	bool
+	 */
+	public function actionDeleteBulk(string $storageID_List)
+	{
+		$jsonData = [];
 
+		if (!empty($storageID_List)) {
+			$jsonData = json_decode($storageID_List, true);
+		}
+
+		if (empty($jsonData)) {
+			$this->redirect('Files:default');
+			return;
+		}
+
+		// TODO: JSON Validation!
+		foreach ($jsonData as $storageID) {
+			//$this->actionDelete($storageID);
+
+			// OWNER ID (GET CURRENTLY LOGGED USER ID)
+			$ownerID = (isset($this->getUser()->id) ? $this->getUser()->id : 0);
+
+			//$resultSel = $this->database->query('SELECT * FROM storage_files WHERE ownerID = ? AND storageID = ? LIMIT 1', $ownerID, $storageID);
+			$resultSel = $this->database->query('SELECT * FROM storage_files WHERE storageID = ? LIMIT 1', $storageID);
+			if ($resultSel->getRowCount() != 1) {
+				$this->flashMessage('CHYBA: Soubor nebyl nalezen, nebo pro jeho odstranění nemáte dostatečná oprávnění.', 'danger');
+				$this->redirect('Files:default');
+				return;
+			}
+
+			$data = $resultSel->fetch();
+			//$basePath = 'data';
+			$basePath = '..' . DIRECTORY_SEPARATOR . 'data';
+			$dirLetter = str_split($data->storageID, 1)[0];
+			$baseName = $data->fileName;
+			$hashName = $data->storageID;
+			$storFile = $basePath . DIRECTORY_SEPARATOR . $dirLetter . DIRECTORY_SEPARATOR . $hashName;
+
+			/*if (!file_exists($storFile)) {
+				$this->flashMessage('CHYBA: Soubor "' . $baseName . '" nebyl nalezen.', 'danger');
+				$this->redirect('Files:default');
+				return;
+			}*/
+
+			if (file_exists($storFile) && !unlink($storFile)) {
+				$this->flashMessage('CHYBA: Soubor "' . $baseName . '" nelze smazat.', 'danger');
+				$this->redirect('Files:default');
+				return;
+			}
+
+			$resultDel = $this->database->query('DELETE FROM storage_files WHERE fileID = ? LIMIT 1', $data->fileID);
+			if ($resultDel->getRowCount() != 1) {
+				$this->flashMessage('CHYBA: Soubor "' . $baseName . '" se nepodařilo odstranit z databáze.', 'danger');
+				$this->redirect('Files:default');
+				return;
+			}
+
+			$this->flashMessage('Soubor "' . $baseName . '" byl odstraněn.', 'info'); // TODO: NAPROGRAMOVAT KOŠ A PŘESOUVAT DO KOŠE !!!
+		}
+
+		$this->redirect('Files:default');
+		return;
+	}
 }

@@ -67,7 +67,7 @@
 
 			<div class="row" style="padding-bottom: 15px;">
 				<div class="col-lg-12">
-					<span id="dowload-all-selected" class='btn span-action-button button-green'><i class="fas fa-cloud-download-alt"></i> STÁHNOUT</span>
+					<span id="download-all-selected" class='btn span-action-button button-green'><i class="fas fa-cloud-download-alt"></i> STÁHNOUT</span>
 					<span id="delete-all-selected"  class='btn span-action-button button-red'><i class="fas fa-trash-alt"></i> SMAZAT</span>
 					<!--span class='btn span-action-button-oragne button'><i class="fas fa-download"></i> STÁHNOUT</span>
 					<span class='btn span-action-button-gray button'><i class="fas fa-file-download"></i> STÁHNOUT</span-->
@@ -81,33 +81,54 @@
 
 {block scripts}
 {include parent}
-	<script src="{$baseUrl}/libs/dropzone-5.7.0/dist/dropzone.js?v=21092901"></script>
-	<script src="{$baseUrl}/libs/dropzone-uploader/dropzoneUploader.js?v=21092901"></script>
+	<script src="{$baseUrl}/libs/dropzone-5.7.0/dist/dropzone.js?v=2021112100"></script>
+	<script src="{$baseUrl}/libs/dropzone-uploader/dropzoneUploader.js?v=2021112100"></script>
 	<script>
 	jQuery(document).ready(function($) {
 		$(".clickable-row").click(function() {
 			window.location = $(this).data("href");
 		});
+
 		$(".delete-action").click(function() {
-			//return confirm('POZOR: Soubor "'+$(this).data("filename")+'" bude ODSTRANĚN.\nChcete pokračovat?');
+			return confirm('POZOR: Soubor "'+$(this).data("filename")+'" bude ODSTRANĚN.\nChcete pokračovat?');
 		});
+
 		$(".file-selector").click(function() {
 			//alert($(this).data("storageid"));
 		});
-		$("#delete-all-selected").click(function() {
-			//alert('TEST: delete-all-selected');
+
+		$("#select-all-files").click(function(){
+			$('input:checkbox').not(this).prop('checked', this.checked);
+		});
+
+		$("#download-all-selected").click(function() {
 			var storageID_List = [];
 			$('.file-selector:checkbox:checked').each(function () {
-				//storageIDs.push(this.checked ? $(this).data("storageid") : "");
-				if(this.checked) {
+				if (this.checked) {
 					storageID_List.push($(this).data("storageid"));
 				}
 			});
-			//alert(storageID_List.toString());
-			alert('DEBUG: '+JSON.stringify(storageID_List));
+			alert('DEBUG (DOWNLOAD): ' + JSON.stringify(storageID_List));
 		});
-		$("#select-all-files").click(function(){
-			$('input:checkbox').not(this).prop('checked', this.checked);
+
+		$("#delete-all-selected").click(function() {
+			var fileList = $('.file-selector:checkbox:checked');
+			if (confirm('POZOR: Vybrané soubory (' + fileList.length + ') budou ODSTRANĚNY.\nChcete pokračovat?')) {
+				var storageID_List = [];
+				fileList.each(function () {
+					if(this.checked) {
+						storageID_List.push($(this).data("storageid"));
+					}
+				});
+
+				$.ajax({ url: {$baseUrl} + '/files/delete-bulk/?storageID_List=' + JSON.stringify(storageID_List),
+					type: "GET",
+					data: null,
+					success: function (response) { 
+						window.location = {$baseUrl} + "/files";
+					}
+				});
+			};
 		});
 	});
 	</script>

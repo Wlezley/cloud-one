@@ -41,7 +41,7 @@ class DropzoneUploaderExtension extends \Nette\DI\CompilerExtension
 
 	public function getDefaults()
 	{
-		return /*$this->getConfig(*/$this->defaults;//);
+		return $this->defaults;
 	}
 
 	public function loadConfiguration()

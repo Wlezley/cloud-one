@@ -40,6 +40,7 @@ final class FilesPresenter extends SecuredPresenter
 	// ############################################################################################
 
 	/** Vygeneruje nahodny alfa-numericky kod
+	 * @todo Presunout do MODELU!
 	 * @param	integer			$size
 	 * @param	string|NULL		$table
 	 * @param	string|NULL		$field
@@ -50,8 +51,7 @@ final class FilesPresenter extends SecuredPresenter
 	{
 		$charlist = '0-9a-z';
 
-		if($table == NULL || $field == NULL)
-		{
+		if ($table == NULL || $field == NULL) {
 			return Random::generate($size, $charlist);
 		}
 
@@ -59,8 +59,7 @@ final class FilesPresenter extends SecuredPresenter
 		$counter = 0;
 		$limit = 100;
 
-		for($counter; $counter < $limit; $counter++)
-		{
+		for ($counter; $counter < $limit; $counter++) {
 			$randomCode = Random::generate($size, $charlist);
 			$result = $this->database->query('SELECT * FROM `'.$table.'` WHERE ? = ? LIMIT 1', $field, $randomCode);
 			if(!isset($result) || $result->getRowCount() == 0) break;
@@ -82,7 +81,9 @@ final class FilesPresenter extends SecuredPresenter
 			$timestampNow = Carbon::now()->format('Y-m-d H:i:s');					// CURRENT TIMESTAMP
 			$downloadID = $this->getRandomCode(16, 'storage_files', 'downloadID');	// DOWNLOAD ID (KEY)
 
-			if ($suffix === "jpeg") $suffix = "jpg";
+			if ($suffix === "jpeg") {
+				$suffix = "jpg";
+			}
 
 			$this->database->table('storage_files')->insert([
 				//'fileID'		=> 0,				// (int 11)		AUTO_INCREMENT
@@ -113,13 +114,11 @@ final class FilesPresenter extends SecuredPresenter
 		$this->template->filesCount = 0;
 
 		$resultFiles = $this->database->query('SELECT * FROM storage_files ORDER BY fileName ASC' );
-		if(($this->template->filesCount = $resultFiles->getRowCount()) >= 1)
-		{
+		if (($this->template->filesCount = $resultFiles->getRowCount()) >= 1) {
 			$this->template->fileList = $resultFiles->fetchAll();
 		}
 
-		if(!isset($this->template->fileList) || $this->template->fileList == NULL)
-		{
+		if (!isset($this->template->fileList) || $this->template->fileList == NULL) {
 			$this->flashMessage('Složka je prázdná.', 'info');
 			return;
 		}
@@ -127,10 +126,8 @@ final class FilesPresenter extends SecuredPresenter
 		$this->template->ownerList = array();
 
 		$resultOwners = $this->database->query('SELECT id,username,fullname,role FROM user_accounts ORDER BY id ASC' );
-		if($resultOwners->getRowCount() >= 1)
-		{
-			foreach($resultOwners->fetchAll() as $owner)
-			{
+		if ($resultOwners->getRowCount() >= 1) {
+			foreach ($resultOwners->fetchAll() as $owner) {
 				$this->template->ownerList[$owner->id] = [
 					'username' => $owner->username,
 					'fullname' => $owner->fullname,
@@ -149,8 +146,7 @@ final class FilesPresenter extends SecuredPresenter
 
 		//$resultSel = $this->database->query('SELECT * FROM storage_files WHERE ownerID = ? AND storageID = ? AND downloadID = ? LIMIT 1', $ownerID, $storageID, $downloadID);
 		$resultSel = $this->database->query('SELECT * FROM storage_files WHERE storageID = ? AND downloadID = ? LIMIT 1', $storageID, $downloadID);
-		if($resultSel->getRowCount() != 1)
-		{
+		if ($resultSel->getRowCount() != 1) {
 			$this->flashMessage('CHYBA: Soubor nebyl nalezen, nebo pro jeho stažení nemáte dostatečná oprávnění.', 'danger');
 			$this->redirect('Files:default');
 			return;
@@ -164,8 +160,7 @@ final class FilesPresenter extends SecuredPresenter
 		$hashName = $data->storageID;
 		$storFile = $basePath . DIRECTORY_SEPARATOR . $dirLetter . DIRECTORY_SEPARATOR . $hashName;
 
-		if (!file_exists($storFile))
-		{
+		if (!file_exists($storFile)) {
 			$this->flashMessage('CHYBA: Soubor "' . $baseName . '" nebyl nalezen.', 'danger');
 			$this->redirect('Files:default');
 			return;
@@ -196,8 +191,7 @@ final class FilesPresenter extends SecuredPresenter
 
 		//$resultSel = $this->database->query('SELECT * FROM storage_files WHERE ownerID = ? AND storageID = ? LIMIT 1', $ownerID, $storageID);
 		$resultSel = $this->database->query('SELECT * FROM storage_files WHERE storageID = ? LIMIT 1', $storageID);
-		if($resultSel->getRowCount() != 1)
-		{
+		if ($resultSel->getRowCount() != 1) {
 			$this->flashMessage('CHYBA: Soubor nebyl nalezen, nebo pro jeho odstranění nemáte dostatečná oprávnění.', 'danger');
 			$this->redirect('Files:default');
 			return;
@@ -211,8 +205,7 @@ final class FilesPresenter extends SecuredPresenter
 		$hashName = $data->storageID;
 		$storFile = $basePath . DIRECTORY_SEPARATOR . $dirLetter . DIRECTORY_SEPARATOR . $hashName;
 
-		/*if (!file_exists($storFile))
-		{
+		/*if (!file_exists($storFile)) {
 			$this->flashMessage('CHYBA: Soubor "' . $baseName . '" nebyl nalezen.', 'danger');
 			$this->redirect('Files:default');
 			return;
@@ -225,8 +218,7 @@ final class FilesPresenter extends SecuredPresenter
 		}
 
 		$resultDel = $this->database->query('DELETE FROM storage_files WHERE fileID = ? LIMIT 1', $data->fileID);
-		if($resultDel->getRowCount() != 1)
-		{
+		if ($resultDel->getRowCount() != 1) {
 			$this->flashMessage('CHYBA: Soubor "' . $baseName . '" se nepodařilo odstranit z databáze.', 'danger');
 			$this->redirect('Files:default');
 			return;

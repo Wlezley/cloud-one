@@ -124,23 +124,19 @@ class DropzoneUploader extends \Nette\Application\UI\Control
 	{
 		$file = $values->file;
 
-		if(!$file instanceof \Nette\Http\FileUpload)
-		{
+		if(!$file instanceof \Nette\Http\FileUpload) {
 			throw new \Nette\FileNotFoundException('Nahraný soubor není typu Nette\Http\FileUpload. Pravděpodobně se nenahrál v pořádku.');
 		}
 
-		if(!$file->isOk())
-		{
+		if(!$file->isOk()) {
 			throw new \Nette\FileNotFoundException('Soubor byl poškozen: ' . $file->error);
 		}
 
-		/*if($this->isImage && $file->isImage() !== $this->isImage)
-		{
+		/*if($this->isImage && $file->isImage() !== $this->isImage) {
 			throw new \Nette\InvalidArgumentException('Soubor musí být obrázek');
 		}*/
 
-		/*if(is_array($this->allowType) && in_array($file->getContentType(), $this->allowType, TRUE))
-		{
+		/*if(is_array($this->allowType) && in_array($file->getContentType(), $this->allowType, TRUE)) {
 			throw new \Nette\InvalidArgumentException('Soubor není povoleného typu');
 		}*/
 
@@ -163,7 +159,6 @@ class DropzoneUploader extends \Nette\Application\UI\Control
 		$SplitedName = \Nette\Utils\Strings::split($file->getSanitizedName(), '~\.\s*~');
 		$suffix = strtolower(array_pop($SplitedName));
 
-		// 
 		//$this->moveUploadedFile($file, $targetPath, $storageID);
 		$file->move($targetPath . DIRECTORY_SEPARATOR . $storageID);
 
@@ -186,8 +181,7 @@ class DropzoneUploader extends \Nette\Application\UI\Control
 	{
 		$oldmask = umask(0);
 
-		if(!is_dir($this->wwwDir . DIRECTORY_SEPARATOR . $this->path))
-		{
+		if(!is_dir($this->wwwDir . DIRECTORY_SEPARATOR . $this->path)) {
 			mkdir($this->wwwDir . DIRECTORY_SEPARATOR . $this->path, 0755, true);
 		}
 

@@ -30,18 +30,13 @@ class UploadPresenter extends BasePresenter
 
 	public function actionDefault($hash)
 	{
-		if (!isset($hash))
-		{
-			return;
-		}
-		else if ($hash == '1aerg6384areg651dfb8atr468hzz4ar6t84t541')
-		{
-			$this->template->hash = $hash;
+		if ($hash == '1aerg6384areg651dfb8atr468hzz4ar6t84t541' && isset($_FILES["fileToUpload"])) {
+			//$this->template->hash = $hash;
 
-			if (!isset($_FILES["fileToUpload"])) {
+			/*if (!isset($_FILES["fileToUpload"])) {
 				echo "E: FTU/FNF";
 				return;
-			}
+			}*/
 
 			$target_dir = "uploads/";
 			$target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
@@ -73,8 +68,7 @@ class UploadPresenter extends BasePresenter
 			}*/
 
 			// Allow certain file formats
-			if ($imageFileType != "jpg" && $imageFileType != "png" &&
-				$imageFileType != "jpeg" && $imageFileType != "gif" )
+			if (!in_array($imageFileType, ["jpg","jpeg","png","gif"]))
 			{
 				echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
 				$uploadOk = 0;
@@ -92,9 +86,8 @@ class UploadPresenter extends BasePresenter
 				}
 			}
 		}
-		else
-		{
-			return;
-		}
+
+		$this->redirect('Files:default');
+		return;
 	}
 }

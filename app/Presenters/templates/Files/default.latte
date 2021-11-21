@@ -49,7 +49,7 @@
 						<input type="checkbox" class="file-selector" data-storageid="{$file['storageID']}">
 					</td>
 					<td style="text-align: center;">
-						<img style="width:30px; height:30px;" src="/img/file-types/{$file['fileMime']}.png">
+						<img style="width:30px; height:30px;" src="{$baseUrl}/img/file-types/{$file['fileMime']}.png">
 					</td>
 					<td style="text-align: left;"	class="clickable-row" data-href="{$downloadLink}">{$file['fileName']}</td>
 					<td style="text-align: right;"	class="clickable-row" data-href="{$downloadLink}">{$file['fileSize']|bytes:0}</td>

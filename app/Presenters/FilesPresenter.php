@@ -174,6 +174,76 @@ final class FilesPresenter extends SecuredPresenter
 		$this->redirect('Files:default');
 	}
 
+	public function actionDownloadBulk(string $storageID_List /*, $storageID, $downloadID*/)
+	{
+		$jsonData = [];
+
+		if (!empty($storageID_List)) {
+			$jsonData = json_decode($storageID_List, true);
+		}
+
+		if (empty($jsonData)) {
+			$this->redirect('Files:default');
+			return;
+		}
+
+		$basePath = ".." . DIRECTORY_SEPARATOR . "data";
+		$zipName = "tutovka.zip";
+		$zipFile = $basePath . DIRECTORY_SEPARATOR . "zip" . DIRECTORY_SEPARATOR . $zipName;
+
+		$zip = new \ZipArchive();
+		if ($zip->open($zipFile, \ZipArchive::CREATE) === TRUE) {
+			// TODO: Frontend 2 Backend Validation !!!
+			foreach ($jsonData as $storageID) {
+
+				$resultSel = $this->database->query('SELECT * FROM storage_files WHERE storageID = ? LIMIT 1', $storageID);
+
+				if ($resultSel->getRowCount() != 1) {
+					$this->flashMessage("CHYBA: Soubor (SID: ". $storageID .") nebyl nalezen, nebo pro jeho stažení nemáte dostatečná oprávnění.", "danger");
+					$this->redirect('Files:default');
+					//return;
+					break;
+				}
+
+				$data = $resultSel->fetch();
+				$dirLetter = str_split($data->storageID, 1)[0];
+				$baseName = $data->fileName;
+				$hashName = $data->storageID;
+				$storFile = $basePath . DIRECTORY_SEPARATOR . $dirLetter . DIRECTORY_SEPARATOR . $hashName;
+		
+				$zip->addFile($storFile, $baseName);
+			}
+
+			$zip->close();
+		}
+
+		// ====================================================================================
+
+		header('Content-Description: File Transfer');
+		header('Content-Type: application/zip'); // application/zip
+		header('Content-Disposition: attachment; filename=' . $zipName);
+		//header('Content-Transfer-Encoding: binary');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate');
+		//header('Cache-Control: public');
+		header('Pragma: public');
+		header('Content-Length: ' . filesize($zipFile));
+		ob_clean();
+		flush();
+		readfile($zipFile);
+
+		$this->redirect('Files:default');
+
+		/*header("Content-type: application/zip"); 
+		header("Content-Disposition: attachment; filename=$archive_file_name");
+		header("Content-length: " . filesize($archive_file_name));
+		header("Pragma: no-cache"); 
+		header("Expires: 0"); 
+		readfile("$archive_file_name");*/
+
+		//$this->terminate();
+	}
+
 	public function actionDelete($storageID)
 	{
 		// OWNER ID (GET CURRENTLY LOGGED USER ID)
@@ -236,7 +306,6 @@ final class FilesPresenter extends SecuredPresenter
 			return;
 		}
 
-		// TODO: JSON Validation!
 		foreach ($jsonData as $storageID) {
 			//$this->actionDelete($storageID);
 

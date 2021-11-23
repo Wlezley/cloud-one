@@ -112,21 +112,25 @@
 				}
 			});
 
-			$.ajax({ url: {$baseUrl} + '/files/download-bulk/?storageID_List=' + JSON.stringify(storageID_List),
+			/*$.ajax({ url: {$baseUrl} + '/files/download-bulk/?storageID_List=' + JSON.stringify(storageID_List),
 				type: "GET",
 				data: null,
 				success: function (response) { 
 					//window.location = {$baseUrl} + "/files";
 				}
-			});
+			});*/
+
+			window.location = {$baseUrl} + "/files/download-bulk/?storageID_List=" + JSON.stringify(storageID_List);
 
 			//alert('DEBUG (DOWNLOAD): ' + JSON.stringify(storageID_List));
 		});
 
 		$("#delete-all-selected").click(function() {
 			var fileList = $('.file-selector:checkbox:checked');
+
 			if (fileList.length > 0 && confirm('POZOR: Vybrané soubory (' + fileList.length + ') budou ODSTRANĚNY.\nChcete pokračovat?')) {
 				var storageID_List = [];
+
 				fileList.each(function () {
 					if(this.checked) {
 						storageID_List.push($(this).data("storageid"));
@@ -136,7 +140,7 @@
 				$.ajax({ url: {$baseUrl} + '/files/delete-bulk/?storageID_List=' + JSON.stringify(storageID_List),
 					type: "GET",
 					data: null,
-					success: function (response) { 
+					success: function (response) {
 						window.location = {$baseUrl} + "/files";
 					}
 				});

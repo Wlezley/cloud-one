@@ -136,7 +136,7 @@ final class FilesPresenter extends SecuredPresenter
 		// OWNER ID (GET CURRENTLY LOGGED USER ID)
 		$ownerID = (isset($this->getUser()->id) ? $this->getUser()->id : 0);
 
-		//$resultSel = $this->database->query('SELECT * FROM storage_files WHERE ownerID = ? AND storageID = ? AND downloadID = ? LIMIT 1', $ownerID, $storageID, $downloadID);
+	//	$resultSel = $this->database->query('SELECT * FROM storage_files WHERE storageID = ? AND downloadID = ? AND ownerID = ? LIMIT 1', $storageID, $downloadID, $ownerID);
 		$resultSel = $this->database->query('SELECT * FROM storage_files WHERE storageID = ? AND downloadID = ? LIMIT 1', $storageID, $downloadID);
 		if ($resultSel->getRowCount() != 1) {
 			$this->flashMessage('CHYBA: Soubor nebyl nalezen, nebo pro jeho stažení nemáte dostatečná oprávnění.', 'danger');
@@ -145,7 +145,6 @@ final class FilesPresenter extends SecuredPresenter
 		}
 
 		$data = $resultSel->fetch();
-		//$basePath = 'data';
 		$basePath = '..' . DIRECTORY_SEPARATOR . 'data';
 		$dirLetter = str_split($data->storageID, 1)[0];
 		$baseName = $data->fileName;
@@ -174,73 +173,63 @@ final class FilesPresenter extends SecuredPresenter
 		$this->redirect('Files:default');
 	}
 
-	public function actionDownloadBulk(string $storageID_List /*, $storageID, $downloadID*/)
+	public function actionDownloadBulk(string $storageID_List)
 	{
+		// OWNER ID (GET CURRENTLY LOGGED USER ID)
+		$ownerID = (isset($this->getUser()->id) ? $this->getUser()->id : 0);
+
 		$jsonData = [];
 
-		if (!empty($storageID_List)) {
-			$jsonData = json_decode($storageID_List, true);
-		}
-
-		if (empty($jsonData)) {
+		if (empty($storageID_List) || empty($jsonData = json_decode($storageID_List, true))) {
+			$this->flashMessage("CHYBA: Soubor nebyl nalezen, nebo nemáte dostatečná oprávnění.", "danger");
 			$this->redirect('Files:default');
 			return;
 		}
 
 		$basePath = ".." . DIRECTORY_SEPARATOR . "data";
-		$zipName = "tutovka.zip";
+		$zipName = "cloud_one_bulk_" . Carbon::now()->format('Y-m-d_H-i-s') . ".zip";
 		$zipFile = $basePath . DIRECTORY_SEPARATOR . "zip" . DIRECTORY_SEPARATOR . $zipName;
 
 		$zip = new \ZipArchive();
-		if ($zip->open($zipFile, \ZipArchive::CREATE) === TRUE) {
-			// TODO: Frontend 2 Backend Validation !!!
+		if ($zip->open($zipFile, \ZipArchive::CREATE) === true) {
 			foreach ($jsonData as $storageID) {
-
+			//	$resultSel = $this->database->query('SELECT * FROM storage_files WHERE storageID = ? AND downloadID = ? AND ownerID = ? LIMIT 1', $storageID, $downloadID, $ownerID);
 				$resultSel = $this->database->query('SELECT * FROM storage_files WHERE storageID = ? LIMIT 1', $storageID);
 
 				if ($resultSel->getRowCount() != 1) {
-					$this->flashMessage("CHYBA: Soubor (SID: ". $storageID .") nebyl nalezen, nebo pro jeho stažení nemáte dostatečná oprávnění.", "danger");
+					$this->flashMessage("CHYBA: Soubor (SID: " . $storageID . ") nebyl nalezen, nebo pro jeho stažení nemáte dostatečná oprávnění.", "danger");
 					$this->redirect('Files:default');
-					//return;
-					break;
+					return;
 				}
 
 				$data = $resultSel->fetch();
-				$dirLetter = str_split($data->storageID, 1)[0];
+				$dirLetter = substr($data->storageID, 0, 1);
 				$baseName = $data->fileName;
 				$hashName = $data->storageID;
 				$storFile = $basePath . DIRECTORY_SEPARATOR . $dirLetter . DIRECTORY_SEPARATOR . $hashName;
 		
 				$zip->addFile($storFile, $baseName);
 			}
-
 			$zip->close();
+
+			// TODO: Opravit stahovani velkych souboru (500 MB +)
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/zip');
+			header('Content-Disposition: attachment; filename=' . $zipName);
+			//header('Content-Transfer-Encoding: binary');
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			//header('Cache-Control: public');
+			header('Pragma: public');
+			header('Content-Length: ' . filesize($zipFile));
+			ob_clean();
+			flush();
+			readfile($zipFile);
+
+			unlink($zipFile);
 		}
 
-		// ====================================================================================
-
-		header('Content-Description: File Transfer');
-		header('Content-Type: application/zip'); // application/zip
-		header('Content-Disposition: attachment; filename=' . $zipName);
-		//header('Content-Transfer-Encoding: binary');
-		header('Expires: 0');
-		header('Cache-Control: must-revalidate');
-		//header('Cache-Control: public');
-		header('Pragma: public');
-		header('Content-Length: ' . filesize($zipFile));
-		ob_clean();
-		flush();
-		readfile($zipFile);
-
 		$this->redirect('Files:default');
-
-		/*header("Content-type: application/zip"); 
-		header("Content-Disposition: attachment; filename=$archive_file_name");
-		header("Content-length: " . filesize($archive_file_name));
-		header("Pragma: no-cache"); 
-		header("Expires: 0"); 
-		readfile("$archive_file_name");*/
-
 		//$this->terminate();
 	}
 

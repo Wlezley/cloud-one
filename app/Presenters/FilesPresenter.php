@@ -105,14 +105,55 @@ final class FilesPresenter extends SecuredPresenter
 	public function renderDefault()
 	{
 		$this->template->fileList = NULL;
-		$this->template->filesCount = 0;
+		$this->template->countFiles = 0;
 
 		$resultFiles = $this->database->query('SELECT * FROM storage_files ORDER BY fileName ASC' );
-		if (($this->template->filesCount = $resultFiles->getRowCount()) >= 1) {
+		if (($this->template->countFiles = $resultFiles->getRowCount()) >= 1) {
 			$this->template->fileList = $resultFiles->fetchAll();
 		}
 
 		if (!isset($this->template->fileList) || $this->template->fileList == NULL) {
+			$this->flashMessage('Složka je prázdná.', 'info');
+			return;
+		}
+
+		$this->template->ownerList = array();
+
+		$resultOwners = $this->database->query('SELECT id,username,fullname,role FROM user_accounts ORDER BY id ASC' );
+		if ($resultOwners->getRowCount() >= 1) {
+			foreach ($resultOwners->fetchAll() as $owner) {
+				$this->template->ownerList[$owner->id] = [
+					'username' => $owner->username,
+					'fullname' => $owner->fullname,
+					'role'     => $owner->role,
+				];
+			}
+		}
+	}
+
+	public function renderDirectory($path)
+	{
+		//$this->database->query("INSERT INTO `storage_tree` (`parentID`, `ownerID`, `name`, `nameUrl`) VALUES (4, 1, 'test 2', 'test-2')");
+
+		$this->template->treeList = NULL;
+		$this->template->fileList = NULL;
+
+		$this->template->countFolders = 0;
+		$this->template->countFiles = 0;
+		$this->template->path = $path;
+
+		
+		$resultFolders = $this->database->query('SELECT * FROM storage_tree ORDER BY nameUrl ASC' );
+		if (($this->template->countFolders = $resultFolders->getRowCount()) >= 1) {
+			$this->template->treeList = $resultFolders->fetchAll();
+		}
+
+		$resultFiles = $this->database->query('SELECT * FROM storage_files ORDER BY fileName ASC' );
+		if (($this->template->countFiles = $resultFiles->getRowCount()) >= 1) {
+			$this->template->fileList = $resultFiles->fetchAll();
+		}
+
+		if (empty($this->template->treeList) || empty($this->template->fileList)) {
 			$this->flashMessage('Složka je prázdná.', 'info');
 			return;
 		}

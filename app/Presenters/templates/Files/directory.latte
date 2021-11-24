@@ -1,0 +1,190 @@
+{block title}Všechny soubory{/block}
+
+{block head}
+{include parent}
+	<link rel="stylesheet" type="text/css" href="{$baseUrl}/libs/dropzone-5.7.0/dist/dropzone.css">
+{/block}
+
+{block content}
+	<div id="banner">
+		<h1>{include title|striptags}</h1>
+	</div>
+
+
+	<div id="content">
+		<!--h2>CLOUD1://</h2-->
+		<div class="row">
+			<div class="col-lg-12">
+				{control uploader}
+				<!--hr style="margin-top: -10px; padding-top: 0px; border-top: 1px solid #000;"-->
+			</div>
+		</div>
+
+		<h2>CLOUD1://{$path}/</h2>
+		{include '../layout/alerts.latte'}
+		{if $fileList}
+		<div>
+			<!--table class="col-lg-12 table table-universal" style="border-left: 1px solid #dee2e6; border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;"-->
+			<table class="col-lg-12 table table-universal" style="border: 1px solid #dee2e6;">
+				<tr>
+					<th style="text-align: right; width: 5px; padding-right: 0px;">
+						<input type="checkbox" id="select-all-files" name="select-all-files">
+					</th>
+					<th style="text-align: center; width: 55px;"><!-- IKONA --></th>
+					<th style="text-align: left;">Jméno souboru</th>
+					<th style="text-align: center; width: 120px;">Velikost</th>
+					<th style="text-align: center; width: 150px;">Datum</th>
+					<th style="text-align: center; width: 125px;">Vlastník</th>
+					<th style="text-align: center; width: 38px; min-width: 38px; border-bottom: 1px solid #dee2e6;
+								border-left: 1px solid #dee2e6; {*border-right: 1px solid #dee2e6;*}
+								padding-right: 0; padding-left: 0;"><i class="fas fa-cogs"></i></th>
+				</tr>
+				{capture $downloadLink}{link Files:default}{/capture}
+				<tr class="table-row-hover">
+					<td style="text-align: center; width: 5px; padding-right: 0px;">
+						{*<input type="checkbox" class="file-selector" data-storageid="TREE_{$tree['nameUrl']}">*}
+					</td>
+					<td style="text-align: center;">
+						<img style="width:30px; height:30px;" src="{$baseUrl}/img/file-types/unknown.png">
+					</td>
+					<td style="text-align: left;"	class="clickable-row" data-href="{$downloadLink}"><strong>[..]</strong></td>
+					<td style="text-align: right;"	class="clickable-row" data-href="{$downloadLink}"><strong>&lt;DIR&gt;</strong></td>
+					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}"></td>
+					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}"></td>
+					<td style="text-align: center; border-left: 1px solid #dee2e6;">
+						<a href="{*link Files:delete, storageID => $file['storageID']*}" title="Smazat složku"
+							class="btn table-action-button button-red delete-action" data-filename="{*$file['fileName']*}">
+							<i class="fas fa-trash-alt"></i>
+						</a>
+					</td>
+				</tr>
+			{foreach $treeList as $tree}
+				{capture $downloadLink}{link Files:directory $tree['nameUrl']}{/capture}
+				{var $owner = $ownerList[$tree['ownerID']]}
+				<tr class="table-row-hover">
+					<td style="text-align: center; width: 5px; padding-right: 0px;">
+						{*<input type="checkbox" class="file-selector" data-storageid="TREE_{$tree['nameUrl']}">*}
+					</td>
+					<td style="text-align: center;">
+						<img style="width:30px; height:30px;" src="{$baseUrl}/img/file-types/unknown.png">
+					</td>
+					<td style="text-align: left;"	class="clickable-row" data-href="{$downloadLink}"><strong>{$tree['name']}</strong></td>
+					<td style="text-align: right;"	class="clickable-row" data-href="{$downloadLink}"><strong>&lt;DIR&gt;</strong></td>
+					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}">{$tree['date_create']|date:'%d.%m.%Y %H:%M'}</td>
+					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}">{$owner['fullname']}</td>
+					<td style="text-align: center; border-left: 1px solid #dee2e6;">
+						<a href="{*link Files:delete, storageID => $file['storageID']*}" title="Smazat složku"
+							class="btn table-action-button button-red delete-action" data-filename="{*$file['fileName']*}">
+							<i class="fas fa-trash-alt"></i>
+						</a>
+					</td>
+				</tr>
+			{/foreach}
+			{foreach $fileList as $file}
+				{capture $downloadLink}{link Files:download $file['storageID'], $file['downloadID']}{/capture}
+				{var $owner = $ownerList[$file['ownerID']]}
+				<tr class="table-row-hover">
+					<td style="text-align: center; width: 5px; padding-right: 0px;">
+						<input type="checkbox" class="file-selector" data-storageid="{$file['storageID']}">
+					</td>
+					<td style="text-align: center;">
+						<img style="width:30px; height:30px;" src="{$baseUrl}/img/file-types/{$file['fileMime']}.png">
+					</td>
+					<td style="text-align: left;"	class="clickable-row" data-href="{$downloadLink}">{$file['fileName']}</td>
+					<td style="text-align: right;"	class="clickable-row" data-href="{$downloadLink}">{$file['fileSize']|bytes:0}</td>
+					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}">{$file['date_upload']|date:'%d.%m.%Y %H:%M'}</td>
+					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}">{$owner['fullname']}</td>
+					<td style="text-align: center; border-left: 1px solid #dee2e6;">
+						<a href="{link Files:delete, storageID => $file['storageID']}" title="Smazat soubor"
+							class="btn table-action-button button-red delete-action" data-filename="{$file['fileName']}">
+							<i class="fas fa-trash-alt"></i>
+						</a>
+					</td>
+				</tr>
+			{/foreach}
+			</table>
+
+			<div class="row" style="padding-bottom: 15px;">
+				<div class="col-lg-12">
+					<span id="download-all-selected" class='btn span-action-button button-green'><i class="fas fa-cloud-download-alt"></i> STÁHNOUT</span>
+					<span id="delete-all-selected"  class='btn span-action-button button-red'><i class="fas fa-trash-alt"></i> SMAZAT</span>
+					<!--span class='btn span-action-button-oragne button'><i class="fas fa-download"></i> STÁHNOUT</span>
+					<span class='btn span-action-button-gray button'><i class="fas fa-file-download"></i> STÁHNOUT</span-->
+				</div>
+			</div>
+		</div>
+		{/if}
+
+	</div>
+{/block}
+
+{block scripts}
+{include parent}
+	<script src="{$baseUrl}/libs/dropzone-5.7.0/dist/dropzone.js?v=2021112100"></script>
+	<script src="{$baseUrl}/libs/dropzone-uploader/dropzoneUploader.js?v=2021112100"></script>
+	<script>
+	jQuery(document).ready(function($) {
+		$(".clickable-row").click(function() {
+			window.location = $(this).data("href");
+		});
+
+		$(".delete-action").click(function() {
+			return confirm('POZOR: Soubor "'+$(this).data("filename")+'" bude ODSTRANĚN.\nChcete pokračovat?');
+		});
+
+		$(".file-selector").click(function() {
+			//alert($(this).data("storageid"));
+		});
+
+		$("#select-all-files").click(function(){
+			$('input:checkbox').not(this).prop('checked', this.checked);
+		});
+
+		$("#download-all-selected").click(function() {
+			var fileList = $('.file-selector:checkbox:checked');
+
+			var storageID_List = [];
+
+			fileList.each(function () {
+				if (this.checked) {
+					storageID_List.push($(this).data("storageid"));
+				}
+			});
+
+			/*$.ajax({ url: {$baseUrl} + '/files/download-bulk/?storageID_List=' + JSON.stringify(storageID_List),
+				type: "GET",
+				data: null,
+				success: function (response) { 
+					//window.location = {$baseUrl} + "/files";
+				}
+			});*/
+
+			window.location = {$baseUrl} + "/files/download-bulk/?storageID_List=" + JSON.stringify(storageID_List);
+
+			//alert('DEBUG (DOWNLOAD): ' + JSON.stringify(storageID_List));
+		});
+
+		$("#delete-all-selected").click(function() {
+			var fileList = $('.file-selector:checkbox:checked');
+
+			if (fileList.length > 0 && confirm('POZOR: Vybrané soubory (' + fileList.length + ') budou ODSTRANĚNY.\nChcete pokračovat?')) {
+				var storageID_List = [];
+
+				fileList.each(function () {
+					if(this.checked) {
+						storageID_List.push($(this).data("storageid"));
+					}
+				});
+
+				$.ajax({ url: {$baseUrl} + '/files/delete-bulk/?storageID_List=' + JSON.stringify(storageID_List),
+					type: "GET",
+					data: null,
+					success: function (response) {
+						window.location = {$baseUrl} + "/files";
+					}
+				});
+			};
+		});
+	});
+	</script>
+{/block}

@@ -29,7 +29,6 @@ database:
 services:
 	# Model
 	- App\Model\HistoryLog\HistoryLog
-	- App\Model\SmsBrana\SmsBrana
 
 	# Forms
 	- App\Forms\SignInFormFactory

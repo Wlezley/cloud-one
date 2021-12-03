@@ -6,7 +6,7 @@ namespace App\Model\User;
 
 use Nette;
 
-use Nette\Database\Context;
+use Nette\Database\Explorer;
 use Nette\Security\IAuthenticator;
 use Nette\Security\Passwords;
 use Nette\Security\Identity;
@@ -15,15 +15,15 @@ use Nette\Security\Identity;
 
 class Authenticator implements Nette\Security\IAuthenticator
 {
-	/** @var Nette\Database\Context */
-	protected $database;
+	/** @var Nette\Database\Explorer */
+	protected $db;
 
 	/** @var Passwords */
 	private $passwords;
 
-	public function __construct(Context $database, Passwords $passwords)
+	public function __construct(Explorer $db, Passwords $passwords)
 	{
-		$this->database = $database;
+		$this->db = $db;
 		$this->passwords = $passwords;
 	}
 
@@ -36,7 +36,7 @@ class Authenticator implements Nette\Security\IAuthenticator
 	{
 		list($username, $password) = $credentials;
 
-		$row = $this->database->table('user_accounts')->where('username', $username)->fetch();
+		$row = $this->db->table('user_accounts')->where('username', $username)->fetch();
 
 		if (!($row && $this->passwords->verify($password, $row->password))) {
 			throw new Nette\Security\AuthenticationException('Nesprávné přihlašovací údaje');
@@ -55,7 +55,7 @@ class Authenticator implements Nette\Security\IAuthenticator
 	 */
 	public function addUser($username, $password, $role = 'user')
 	{
-		$this->database->table('user_accounts')->insert([
+		$this->db->table('user_accounts')->insert([
 			'username' => $username,
 			'password' => $this->passwords->hash($password),
 			'role'	   => $role

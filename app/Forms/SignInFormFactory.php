@@ -22,11 +22,11 @@ class SignInFormFactory /*extends Nette\Object*/
 		$form = new Form();
 
 		$form->addText('username', 'Přihlašovací jméno')
-			->setAttribute('placeholder', 'Přihlašovací jméno')
+			->setHtmlAttribute('placeholder', 'Přihlašovací jméno')
 			->setRequired();
 
 		$form->addPassword('password', 'Heslo')
-			->setAttribute('placeholder', 'Heslo')
+			->setHtmlAttribute('placeholder', 'Heslo')
 			->setRequired();
 
 		$form->addSubmit('send', 'Přihlásit se');

@@ -23,7 +23,7 @@ class StorageTree extends Storage
 
 	public function __construct()
 	{
-		parent::__construct($this->database);
+		parent::__construct();
 	}
 
 	public function load(int $tree_id)
@@ -73,7 +73,7 @@ class StorageTree extends Storage
 
 		// TODO: VALIDATE INPUT DATA HERE!!!
 
-		$return = $this->database->query("INSERT INTO storage_tree ?", [
+		$return = $this->db->query("INSERT INTO storage_tree ?", [
 			//	"treeID"		=> null,		// INT(11) UNSIGNED, AUTO_INCREMENT
 				"parentID"		=> $parentId,	// INT(11)
 				"ownerID"		=> $ownerId,	// INT(11)
@@ -85,7 +85,7 @@ class StorageTree extends Storage
 			//	"date_modify"	=> null,		// TIMESTAMP, ON UPDATE current_timestamp()
 			]);
 
-		return ($return ? $this->database->getInsertId() : null);
+		return ($return ? $this->db->getInsertId() : null);
 	}
 
 	public function renameFolder(int $treeID, string $name) //, int $parentId = 0, int $ownerId = null)

@@ -8,7 +8,7 @@ class StorageFiles extends Storage
 {
 	public function __construct()
 	{
-		parent::__construct($this->database);
+		parent::__construct();
 	}
 }
 

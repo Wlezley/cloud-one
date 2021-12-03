@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace App\Model\HistoryLog;
+namespace App\Model;
 
 use Nette;
 use App\Model;
 use Nette\Utils\Json;
 use Nette\Utils\ArrayHash;
-use Nette\Database\Context;
+use Nette\Database\Explorer;
 use Tracy\Debugger;
 use Carbon\Carbon;
 
 
 class HistoryLog
 {
-	/** @var Nette\Database\Context */
-	protected $database;
+	/** @var Nette\Database\Explorer */
+	protected $db;
 
 	/** @var int */
 	protected $userID;
 
-	public function __construct(Context $database)
+	public function __construct(Explorer $db)
 	{
-		$this->database = $database;
+		$this->db = $db;
 	}
 
 	/*
@@ -43,9 +43,9 @@ class HistoryLog
 	// user, level, action, type, subject, description, data
 	public function writeLogIssueRAW($user = 0, $level = 'n/a', $action = 'unk', $type = 'unk', $subject = NULL, $description = "", $data = NULL)
 	{
-		return $this->database->table('log_history')->insert([
+		return $this->db->table('log_history')->insert([
 			//'id'			=> //AUTOINCREMENT
-			//'date'		=> Carbon::now()->format('Y-m-d H:i:s'), // AUTO: This field is handled by database automatically
+			//'date'		=> Carbon::now()->format('Y-m-d H:i:s'), // AUTO: This field is handled by DB automatically
 			'user'			=> $user,			// 0 = SYSTEM
 		    'level'			=> $level,			// Options: info, warning, error, debug, n/a
 			'action'		=> $action,			// Options: new, add, edit, update, delete, remove, send, print, upload, unk

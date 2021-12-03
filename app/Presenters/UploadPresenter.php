@@ -6,26 +6,20 @@ namespace App\Presenters;
 
 use Nette;
 use App\Model;
-use Nette\Database\Context;
 use Tracy\Debugger;
 
 
 class UploadPresenter extends BasePresenter
 {
-	/** @var Nette\Database\Context */
-	protected $database;
-
 	/** @var Model\HistoryLog\HistoryLog */
 	protected $historyLog;
 
-	public function __construct(Context $database)
+	public function __construct()
 	{
 		// Disable Tracy Debug Bar
 		Debugger::$showBar = false;
 
-		$this->database = $database;
-		//$this->smsBrana = new Model\SmsBrana\SmsBrana($this->database);
-		$this->historyLog = new Model\HistoryLog\HistoryLog($this->database);
+		$this->historyLog = new Model\HistoryLog($this->db);
 	}
 
 	public function actionDefault($hash)

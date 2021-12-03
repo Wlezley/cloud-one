@@ -28,10 +28,14 @@ database:
 
 services:
 	# Model
-	- App\Model\HistoryLog\HistoryLog
+	- App\Model\HistoryLog
+	- App\Model\Storage
 
 	# Forms
 	- App\Forms\SignInFormFactory
+
+	# Presenters
+	#- App\Presenters\CronPresenter(%cron.hash%)
 
 	latte.latteFactory:
 		setup:

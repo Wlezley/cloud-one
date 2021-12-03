@@ -10,22 +10,21 @@ use Nette\Utils\Json;
 use Nette\Utils\Random;
 use Nette\Utils\Strings;
 use Nette\Utils\ArrayHash;
-use Nette\Database\Context;
+use Nette\Database\Explorer;
 use Tracy\Debugger;
 
 use Carbon\Carbon;
 
-abstract class Storage
+class Storage
 {
-	/** @var Nette\Database\Context */
-	protected $database;
+	/** @var Nette\Database\Explorer @inject */
+	public $db;
 
 	/** @var int */
 	protected $userID;
 
-	public function __construct(Context $database)
+	public function __construct()
 	{
-		$this->database = $database;
 	}
 
 	/** Vygeneruje nahodny alfa-numericky kod
@@ -50,7 +49,7 @@ abstract class Storage
 
 		for ($counter; $counter < $limit; $counter++) {
 			$randomCode = Random::generate($size, $charlist);
-			$result = $this->database->query('SELECT * FROM `'.$table.'` WHERE ? = ? LIMIT 1', $field, $randomCode);
+			$result = $this->db->query('SELECT * FROM `'.$table.'` WHERE ? = ? LIMIT 1', $field, $randomCode);
 			if(!isset($result) || $result->getRowCount() == 0) break;
 		}
 

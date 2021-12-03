@@ -8,6 +8,7 @@ use Nette;
 use App\Model;
 use Nette\Utils\Json;
 use Nette\Utils\Random;
+use Nette\Utils\Strings;
 use Nette\Utils\ArrayHash;
 use Nette\Database\Context;
 use Tracy\Debugger;
@@ -107,7 +108,7 @@ final class FilesPresenter extends SecuredPresenter
 		$this->template->fileList = NULL;
 		$this->template->countFiles = 0;
 
-		$resultFiles = $this->database->query('SELECT * FROM storage_files ORDER BY fileName ASC' );
+		$resultFiles = $this->database->query('SELECT * FROM storage_files ORDER BY fileName ASC');
 		if (($this->template->countFiles = $resultFiles->getRowCount()) >= 1) {
 			$this->template->fileList = $resultFiles->fetchAll();
 		}
@@ -119,7 +120,7 @@ final class FilesPresenter extends SecuredPresenter
 
 		$this->template->ownerList = array();
 
-		$resultOwners = $this->database->query('SELECT id,username,fullname,role FROM user_accounts ORDER BY id ASC' );
+		$resultOwners = $this->database->query('SELECT id,username,fullname,role FROM user_accounts ORDER BY id ASC');
 		if ($resultOwners->getRowCount() >= 1) {
 			foreach ($resultOwners->fetchAll() as $owner) {
 				$this->template->ownerList[$owner->id] = [
@@ -142,25 +143,67 @@ final class FilesPresenter extends SecuredPresenter
 		$this->template->countFiles = 0;
 		$this->template->path = $path;
 
-		
-		$resultFolders = $this->database->query('SELECT * FROM storage_tree ORDER BY nameUrl ASC' );
+		$pathArray = [];
+		foreach (explode("/", $path) as $key => $dir) {
+			if (!empty($dir)) {
+				$pathArray[] = Strings::webalize($dir);
+			}
+		}
+		bdump($pathArray, "URL / PATH ARRAY");
+
+		$ownerID = 1;
+		$parentID = 0;
+
+		$treeMap = [];
+		$upDir = "";
+		$lastPath = "";
+		foreach ($pathArray as $key => $nameUrl) {
+			$folder = $this->database->query('SELECT * FROM storage_tree WHERE ownerID = ? AND parentID = ? AND nameUrl = ? LIMIT 1', $ownerID, $parentID, $nameUrl);
+			$folderInfo = $folder->fetch();
+			$upDir = rtrim($lastPath, "/");
+
+			if (!$folderInfo) {
+				$this->redirect("this", ["path" => rtrim($lastPath, "/")]);
+				break;
+			}
+
+			$treeMap[$key] = [
+				"parentID" => $parentID,
+				"treeID" => $folderInfo['treeID'],
+			];
+
+			$lastPath .= $folderInfo['nameUrl'] . "/";
+			$parentID = $folderInfo['treeID'];
+		}
+		bdump($treeMap, "URL / TREE MAP");
+
+		// Folders
+		$this->template->treeList = [];
+		$resultFolders = $this->database->query('SELECT * FROM storage_tree WHERE ownerID = ? AND parentID = ? ORDER BY nameUrl ASC', $ownerID, $parentID);
 		if (($this->template->countFolders = $resultFolders->getRowCount()) >= 1) {
 			$this->template->treeList = $resultFolders->fetchAll();
+			foreach ($this->template->treeList as $key => $item) {
+				$this->template->treeList[$key]['nameUrl'] = $lastPath . $this->template->treeList[$key]['nameUrl'];
+			}
 		}
 
-		$resultFiles = $this->database->query('SELECT * FROM storage_files ORDER BY fileName ASC' );
+		// Files
+		$resultFiles = $this->database->query('SELECT * FROM storage_files ORDER BY fileName ASC');
 		if (($this->template->countFiles = $resultFiles->getRowCount()) >= 1) {
 			$this->template->fileList = $resultFiles->fetchAll();
 		}
 
-		if (empty($this->template->treeList) || empty($this->template->fileList)) {
+		// Empty folder
+		if (empty($this->template->treeList) && empty($this->template->fileList)) {
 			$this->flashMessage('Složka je prázdná.', 'info');
 			return;
 		}
 
 		$this->template->ownerList = array();
+		//$this->template->upDir = rtrim($lastPath, "/");
+		$this->template->upDir = $upDir;
 
-		$resultOwners = $this->database->query('SELECT id,username,fullname,role FROM user_accounts ORDER BY id ASC' );
+		$resultOwners = $this->database->query('SELECT id,username,fullname,role FROM user_accounts ORDER BY id ASC');
 		if ($resultOwners->getRowCount() >= 1) {
 			foreach ($resultOwners->fetchAll() as $owner) {
 				$this->template->ownerList[$owner->id] = [

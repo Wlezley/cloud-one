@@ -39,7 +39,7 @@
 								border-left: 1px solid #dee2e6; {*border-right: 1px solid #dee2e6;*}
 								padding-right: 0; padding-left: 0;"><i class="fas fa-cogs"></i></th>
 				</tr>
-				{capture $downloadLink}{link Files:default}{/capture}
+				{capture $downloadLink}{link Files:directory $upDir}{/capture}
 				<tr class="table-row-hover">
 					<td style="text-align: center; width: 5px; padding-right: 0px;">
 						{*<input type="checkbox" class="file-selector" data-storageid="TREE_{$tree['nameUrl']}">*}

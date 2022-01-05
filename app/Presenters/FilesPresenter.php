@@ -62,6 +62,7 @@ final class FilesPresenter extends SecuredPresenter
 		return ($counter == $limit) ? str_repeat('f', $size) : $randomCode;
 	}
 
+	/** AN UPLOADER CONTROL */
 	public function createComponentUploader()
 	{
 		// CREATE A DROPZONE FACTORY OBJECT
@@ -95,9 +96,16 @@ final class FilesPresenter extends SecuredPresenter
 			]);
 		};
 
+
+		// $session = 
+		$this->getFlashSession()->remove();
+		// bdump($session);
+		// $session->remove();
+
 		return $dropzone;
 	}
 
+	/** RENDER DEFAULT FILE LIST */
 	public function renderDefault()
 	{
 		$this->template->fileList = NULL;
@@ -127,6 +135,7 @@ final class FilesPresenter extends SecuredPresenter
 		}
 	}
 
+	/** RENDER FILE LIST FROM DIRECTORY (WITH SUB-DIRECTORIES) */
 	public function renderDirectory($path)
 	{
 		//$this->db->query("INSERT INTO `storage_tree` (`parentID`, `ownerID`, `name`, `nameUrl`) VALUES (4, 1, 'test 2', 'test-2')");
@@ -210,7 +219,11 @@ final class FilesPresenter extends SecuredPresenter
 		}
 	}
 
-	public function actionDownload($storageID, $downloadID)
+	/** Download file by storageID ans downloadID (hash)
+	 * @param	string	$storageID			Storage ID
+	 * @param	string	$downloadID			Download ID (hash)
+	 */
+	public function actionDownload(string $storageID, string $downloadID): void
 	{
 		// OWNER ID (GET CURRENTLY LOGGED USER ID)
 		$ownerID = (isset($this->getUser()->id) ? $this->getUser()->id : 0);
@@ -252,6 +265,9 @@ final class FilesPresenter extends SecuredPresenter
 		$this->redirect('Files:default');
 	}
 
+	/** Download multiple files as ZIP by storageID JSON field
+	 * @param	string	$storageID_List		JSON string array contains storage IDs
+	 */
 	public function actionDownloadBulk(string $storageID_List)
 	{
 		// OWNER ID (GET CURRENTLY LOGGED USER ID)
@@ -312,7 +328,10 @@ final class FilesPresenter extends SecuredPresenter
 		//$this->terminate();
 	}
 
-	public function actionDelete($storageID)
+	/** Delete file by storageID
+	 * @param	string	$storageID			Storage ID
+	 */
+	public function actionDelete(string $storageID): void
 	{
 		// OWNER ID (GET CURRENTLY LOGGED USER ID)
 		$ownerID = (isset($this->getUser()->id) ? $this->getUser()->id : 0);
@@ -352,16 +371,14 @@ final class FilesPresenter extends SecuredPresenter
 			return;
 		}
 
-		$this->flashMessage('Soubor "' . $baseName . '" byl odstraněn.', 'info'); // TODO: NAPROGRAMOVAT KOŠ A PŘESOUVAT DO KOŠE !!!
+		$this->flashMessage('Soubor "' . $baseName . '" byl odstraněn.', 'success'); // TODO: NAPROGRAMOVAT KOŠ A PŘESOUVAT DO KOŠE !!!
 		$this->redirect('Files:default');
 	}
 
-	/** Deletes files based on the JSON storage id field 
-	 * @todo 			Optimize!!!
-	 * @param	string	JSON contains storage IDs
-	 * @return	bool
+	/** Delete multiple files by storageID JSON field
+	 * @param	string	$storageID_List		JSON string array contains storage IDs
 	 */
-	public function actionDeleteBulk(string $storageID_List)
+	public function actionDeleteBulk(string $storageID_List): void
 	{
 		$jsonData = [];
 
@@ -370,13 +387,13 @@ final class FilesPresenter extends SecuredPresenter
 		}
 
 		if (empty($jsonData)) {
+			$this->flashMessage('CHYBA: Prázdná JSON data.', 'danger');
 			$this->redirect('Files:default');
 			return;
 		}
 
+		$fileCounter = 0;
 		foreach ($jsonData as $storageID) {
-			//$this->actionDelete($storageID);
-
 			// OWNER ID (GET CURRENTLY LOGGED USER ID)
 			$ownerID = (isset($this->getUser()->id) ? $this->getUser()->id : 0);
 
@@ -384,8 +401,8 @@ final class FilesPresenter extends SecuredPresenter
 			$resultSel = $this->db->query('SELECT * FROM storage_files WHERE storageID = ? LIMIT 1', $storageID);
 			if ($resultSel->getRowCount() != 1) {
 				$this->flashMessage('CHYBA: Soubor nebyl nalezen, nebo pro jeho odstranění nemáte dostatečná oprávnění.', 'danger');
-				$this->redirect('Files:default');
-				return;
+				//$this->redirect('Files:default');
+				break;
 			}
 
 			$data = $resultSel->fetch();
@@ -398,27 +415,46 @@ final class FilesPresenter extends SecuredPresenter
 
 			/*if (!file_exists($storFile)) {
 				$this->flashMessage('CHYBA: Soubor "' . $baseName . '" nebyl nalezen.', 'danger');
-				$this->redirect('Files:default');
-				return;
+				//$this->redirect('Files:default');
+				break;
 			}*/
 
 			if (file_exists($storFile) && !unlink($storFile)) {
 				$this->flashMessage('CHYBA: Soubor "' . $baseName . '" nelze smazat.', 'danger');
-				$this->redirect('Files:default');
-				return;
+				//$this->redirect('Files:default');
+				break;
 			}
 
 			$resultDel = $this->db->query('DELETE FROM storage_files WHERE fileID = ? LIMIT 1', $data->fileID);
 			if ($resultDel->getRowCount() != 1) {
 				$this->flashMessage('CHYBA: Soubor "' . $baseName . '" se nepodařilo odstranit z databáze.', 'danger');
-				$this->redirect('Files:default');
-				return;
+				//$this->redirect('Files:default');
+				break;
 			}
 
-			$this->flashMessage('Soubor "' . $baseName . '" byl odstraněn.', 'info'); // TODO: NAPROGRAMOVAT KOŠ A PŘESOUVAT DO KOŠE !!!
+			//$this->flashMessage('Soubor "' . $baseName . '" byl odstraněn.', 'info'); // TODO: NAPROGRAMOVAT KOŠ A PŘESOUVAT DO KOŠE !!!
+
+			$fileCounter++;
 		}
 
+		switch ($fileCounter) {
+			case 0:
+				$outputMessage = ["Nebyl odstraněn žádný soubor", "warning"];
+				break;
+			case 1:
+				$outputMessage = ["Byl odstraněn 1 soubor.", "success"];
+				break;
+			case 2:
+			case 3:
+			case 4:
+				$outputMessage = ["Byly odstraněny " . $fileCounter . " soubory.", "success"];
+				break;
+			default:
+				$outputMessage = ["Bylo odstraněno " . $fileCounter . " souborů.", "success"];
+				break;
+		}
+
+		$this->flashMessage($outputMessage[0], $outputMessage[1]);
 		$this->redirect('Files:default');
-		return;
 	}
 }

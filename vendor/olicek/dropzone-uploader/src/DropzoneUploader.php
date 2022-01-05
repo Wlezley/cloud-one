@@ -9,6 +9,7 @@
 namespace Oli\Form;
 
 use Nette\Utils\Random;
+use Nette\Utils\Strings;
 
 
 /**
@@ -150,7 +151,7 @@ class DropzoneUploader extends \Nette\Application\UI\Control
 		$dirLetter = str_split($storageID, 1)[0];
 
 		// Original filename
-		$fileName = $file->getName();
+		$fileName = \Nette\Utils\Strings::webalize($file->getUntrustedName(), " .-_+", false);
 
 		// Full storage path
 		$targetPath = '..' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . $dirLetter;

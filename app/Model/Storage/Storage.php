@@ -28,29 +28,32 @@ class Storage
 	}
 
 	/** Vygeneruje nahodny alfa-numericky kod
-	 * @todo Presunout do MODELU!
-	 * @param	integer			$size
-	 * @param	string|NULL		$table
-	 * @param	string|NULL		$field
+	 * 
+	 * @param	int				$size
+	 * @param	string|null		$table
+	 * @param	string|null		$field
 	 *
-	 * @return	int|NULL
+	 * @return	string
 	 */
-	public function getRandomCode($size, $table = NULL, $field = NULL)
+	public function getRandomCode($size, $table = null, $field = null)
 	{
 		$charlist = '0-9a-z';
 
-		if ($table == NULL || $field == NULL) {
+		if ($table == null || $field == null) {
 			return Random::generate($size, $charlist);
 		}
 
-		$randomCode = NULL;
+		$randomCode = null;
 		$counter = 0;
 		$limit = 100;
 
 		for ($counter; $counter < $limit; $counter++) {
 			$randomCode = Random::generate($size, $charlist);
 			$result = $this->db->query('SELECT * FROM `'.$table.'` WHERE ? = ? LIMIT 1', $field, $randomCode);
-			if(!isset($result) || $result->getRowCount() == 0) break;
+
+			if (!isset($result) || $result->getRowCount() == 0) {
+				break;
+			}
 		}
 
 		return ($counter == $limit) ? str_repeat('f', $size) : $randomCode;

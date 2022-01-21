@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use Nette;
 use Carbon\Carbon;
 
 class StorageTree extends Storage
 {
+	/** @var Nette\Database\Explorer @inject */
+	public $db;
+
 	public int $tree_id;			// TODO: Rename "treeID"	>>	"tree_id"
 	public int $parent_id;			// TODO: Rename "parentID"	>>	"parent_id"
 	public int $owner_id;			// TODO: Rename "ownerID"	>>	"owner_id"
@@ -21,9 +25,10 @@ class StorageTree extends Storage
 	public bool $is_loaded;
 
 
-	public function __construct(/*$tree_id = null*/)
+	public function __construct(Nette\Database\Explorer $db)
 	{
-		parent::__construct();
+		$this->db = $db;
+		//parent::__construct();
 
 		$this->is_loaded = false;
 
@@ -75,9 +80,9 @@ class StorageTree extends Storage
 			$this->name				= $row["name"];
 			$this->name_url			= $row["nameUrl"];
 			$this->date_create		= Carbon::create($row["date_create"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
-			$this->date_download	= Carbon::create($row["date_download"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
-			$this->date_delete		= Carbon::create($row["date_delete"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
-			$this->date_modify		= Carbon::create($row["date_modify"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
+			// $this->date_download	= Carbon::create($row["date_download"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
+			// $this->date_delete		= Carbon::create($row["date_delete"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
+			// $this->date_modify		= Carbon::create($row["date_modify"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
 			$this->is_loaded		= true;
 		}
 
@@ -201,7 +206,7 @@ class StorageTree extends Storage
 
 	// #######################################################################################################
 
-	public function setOwnerID($owner_id, $save = false)
+	public function setOwnerID(int $owner_id, bool $save = false)
 	{
 		$this->owner_id = $owner_id;
 
@@ -210,7 +215,7 @@ class StorageTree extends Storage
 		}
 	}
 
-	public function setParentID($parent_id, $save = false)
+	public function setParentID(int $parent_id, bool $save = false)
 	{
 		$this->parent_id = $parent_id;
 
@@ -219,7 +224,7 @@ class StorageTree extends Storage
 		}
 	}
 
-	public function setTreeID($tree_id, $save = false)
+	public function setTreeID(int $tree_id, bool $save = false)
 	{
 		$this->tree_id = $tree_id;
 
@@ -228,7 +233,7 @@ class StorageTree extends Storage
 		}
 	}
 
-	public function setName($name, $save = false)
+	public function setName(string $name, bool $save = false)
 	{
 		$this->name = $name;
 		$this->name_url = \Nette\Utils\Strings::Webalize($name);
@@ -242,15 +247,29 @@ class StorageTree extends Storage
 
 	public function getPath() //: string
 	{
-		/*
-		0, parent 0 = root = "/"
-		5, parent 0 =        "/5/"
-		9, parent 5 =        "/5/9/"
-		*/
-		//return "/folder/path/is/this";
+		if (!$this->is_loaded && $this->owner_id == 0) {
+			return false;
+		}
+		if ($this->tree_id == 0) {
+			return "/";
+		}
 
-		$this->parent_id;
+		$path = "/";
+		$tree_id = $this->tree_id;
 
+		do {
+			$row = $this->db->fetch("SELECT parentID, nameUrl FROM storage_tree WHERE treeID = ? AND ownerID = ?", $tree_id, $this->owner_id);
+
+			if (!$row || empty($row["nameUrl"])) {
+				return false;
+			}
+
+			$path = "/" . $row["nameUrl"] . $path;
+			$tree_id = $row["parentID"];
+		}
+		while ($row["parentID"] != 0 && $row);
+
+		return $path;
 	}
 
 	public function getUrl(string $name, int $parentId = 0, int $ownerId = null): string

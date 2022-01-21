@@ -6,6 +6,8 @@ namespace App\Presenters;
 
 use Nette;
 use App\Model;
+use App\Model\Storage;
+use App\Model\StorageTree;
 use Nette\Utils\Json;
 use Nette\Utils\ArrayHash;
 use Tracy\Debugger;
@@ -13,8 +15,12 @@ use Tracy\Debugger;
 
 final class SettingsPresenter extends SecuredPresenter
 {
-	public function __construct()
+	/** @var StorageTree */
+	private $storageTree;
+
+	public function __construct(StorageTree $storageTree)
 	{
+		$this->storageTree = $storageTree;
 	}
 
 	public function startup()
@@ -26,6 +32,13 @@ final class SettingsPresenter extends SecuredPresenter
 	{
 		// DEBUG ?
 		$this->flashMessage('Nastavení cloudu je v rekonstrukci.', 'warning');
+
+		// DEBUG ONLY ---->>
+		$this->storageTree->load(4);
+		$this->template->debug = $this->storageTree->getPath();
+		// <<---- DEBUG ONLY
+
+
 
 		$this->template->seznamUzivatelu = NULL;
 		$this->template->pocetPolozek = 0;

@@ -30,6 +30,7 @@ services:
 	# Model
 	- App\Model\HistoryLog
 	- App\Model\Storage
+	- App\Model\StorageTree
 
 	# Forms
 	- App\Forms\SignInFormFactory

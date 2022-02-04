@@ -4,11 +4,36 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use Nette;
+use Carbon\Carbon;
+
 class StorageFiles extends Storage
 {
-	public function __construct()
+	/** @var Nette\Database\Explorer @inject */
+	public $db;
+
+	public int $tree_id;
+	public array $file_list;
+
+	public bool $is_loaded;
+
+
+	public function __construct(Nette\Database\Explorer $db)
 	{
-		parent::__construct();
+		$this->db = $db;
+		//parent::__construct();
+
+		$this->is_loaded = false;
+
+		// if ($tree_id) {
+		// 	$this->load($tree_id);
+		// }
+	}
+
+	public function load(int $id = 0)
+	{
+		$this->is_loaded = true;
+		return;
 	}
 }
 

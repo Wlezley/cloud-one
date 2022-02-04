@@ -15,11 +15,29 @@
 		{include '../layout/alerts.latte'}
 	</div>
 
-	<div class="row">
+	{* DEBUG *}
+	{* <div class="row">
 		<div class="col-lg-12">
 			<p>{$debug}</p>
 		</div>
-	</div>
+	</div> *}
+
+	{foreach $testing as $key => $test}
+		<h2>Folder ID: {$key}</h2>
+		{* FOLDERS *}
+		<div n:foreach="$test[treeList] as $folder">
+			<p>
+				<a href="{$baseUrl}/files{$folder[full_path]}">CLOUD1:/{$folder[full_path]|upper}</a>
+			</p>
+		</div>
+
+		{* FILES *}
+		<div n:foreach="$test[fileList] as $file">
+			<p>
+				<a href="{$baseUrl}/download/{$file[storageID]}/{$file[downloadID]}">CLOUD1:/{$file[tree_path]|upper}{$file[fileName]}</a>
+			</p>
+		</div>
+	{/foreach}
 
 
 	{*<div class="row col-lg-12">

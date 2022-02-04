@@ -35,6 +35,8 @@ class StorageTree extends Storage
 		// if ($tree_id) {
 		// 	$this->load($tree_id);
 		// }
+
+		$this->reset();
 	}
 
 	/** RESET folder data
@@ -291,9 +293,10 @@ class StorageTree extends Storage
 		return $path;
 	}
 
-	public function getTreeList(): array // získá info o pod-složkách
+	/** List of sub-folders in the folder */
+	public function getTreeList(): array
 	{
-		if (!$this->is_loaded && ($this->owner_id == 0 || $this->tree_id == 0)) {
+		if (!$this->is_loaded && $this->owner_id == 0) {
 			return [];
 		}
 
@@ -308,6 +311,23 @@ class StorageTree extends Storage
 		return $treeList;
 	}
 
+	/** List of files in the folder */
+	public function getFileList(): array
+	{
+		if (!$this->is_loaded && $this->owner_id == 0) {
+			return [];
+		}
+
+		$result = $this->db->query("SELECT * FROM storage_files WHERE tree_id = ? AND owner_id = ? ORDER BY fileName ASC", $this->tree_id, $this->owner_id);
+
+		$fileList = [];
+		foreach ($result as $key => $file) {
+			$fileList[$key] = (array)$file;
+			$fileList[$key]['tree_path'] = $this->getPathByTreeId($file['tree_id']);
+		}
+
+		return $fileList;
+	}
 }
 
 /*

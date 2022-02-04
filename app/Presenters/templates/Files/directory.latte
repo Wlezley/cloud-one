@@ -42,7 +42,7 @@
 				{capture $downloadLink}{link Files:directory $upDir}{/capture}
 				<tr class="table-row-hover">
 					<td style="text-align: center; width: 5px; padding-right: 0px;">
-						{*<input type="checkbox" class="file-selector" data-storageid="TREE_{$tree['nameUrl']}">*}
+						{*<input type="checkbox" class="file-selector" data-storageid="TREE_{$tree['name_url']}">*}
 					</td>
 					<td style="text-align: center;">
 						<img style="width:30px; height:30px;" src="{$baseUrl}/img/file-types/unknown.png">
@@ -59,11 +59,11 @@
 					</td>
 				</tr>
 			{foreach $treeList as $tree}
-				{capture $downloadLink}{link Files:directory $tree['nameUrl']}{/capture}
-				{var $owner = $ownerList[$tree['ownerID']]}
+				{capture $downloadLink}{link Files:directory $tree['name_url']}{/capture}
+				{var $owner = $ownerList[$tree['owner_id']]}
 				<tr class="table-row-hover">
 					<td style="text-align: center; width: 5px; padding-right: 0px;">
-						{*<input type="checkbox" class="file-selector" data-storageid="TREE_{$tree['nameUrl']}">*}
+						{*<input type="checkbox" class="file-selector" data-storageid="TREE_{$tree['name_url']}">*}
 					</td>
 					<td style="text-align: center;">
 						<img style="width:30px; height:30px;" src="{$baseUrl}/img/file-types/unknown.png">
@@ -82,7 +82,7 @@
 			{/foreach}
 			{foreach $fileList as $file}
 				{capture $downloadLink}{link Files:download $file['storageID'], $file['downloadID']}{/capture}
-				{var $owner = $ownerList[$file['ownerID']]}
+				{var $owner = $ownerList[$file['owner_id']]}
 				<tr class="table-row-hover">
 					<td style="text-align: center; width: 5px; padding-right: 0px;">
 						<input type="checkbox" class="file-selector" data-storageid="{$file['storageID']}">

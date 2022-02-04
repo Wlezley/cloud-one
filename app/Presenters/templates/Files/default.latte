@@ -41,7 +41,7 @@
 				</tr>
 			{foreach $fileList as $file}
 				{capture $downloadLink}{link Files:download $file['storageID'], $file['downloadID']}{/capture}
-				{var $owner = $ownerList[$file['ownerID']]}
+				{var $owner = $ownerList[$file['owner_id']]}
 				<tr class="table-row-hover">
 					<td style="text-align: center; width: 5px; padding-right: 0px;">
 						<input type="checkbox" class="file-selector" data-storageid="{$file['storageID']}">

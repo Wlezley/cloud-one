@@ -64,25 +64,25 @@ class StorageTree extends Storage
 	public function load(int $tree_id = 0): StorageTree
 	{
 		if ($tree_id == 0) {
-			if ($this->tree_id) {
+			if (isset($this->tree_id)) {
 				$tree_id = $this->tree_id;
 			} else {
 				return $this->reset();
 			}
 		}
 
-		$row = $this->db->fetch("SELECT * FROM storage_tree WHERE treeID = ?", $tree_id);
+		$row = $this->db->fetch("SELECT * FROM storage_tree WHERE tree_id = ?", $tree_id);
 
 		if ($row) {
-			$this->tree_id			= $row["treeID"];
-			$this->parent_id		= $row["parentID"];
-			$this->owner_id			= $row["ownerID"];
+			$this->tree_id			= $row["tree_id"];
+			$this->parent_id		= $row["parent_id"];
+			$this->owner_id			= $row["owner_id"];
 			$this->name				= $row["name"];
-			$this->name_url			= $row["nameUrl"];
+			$this->name_url			= $row["name_url"];
 			$this->date_create		= Carbon::create($row["date_create"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
 			// $this->date_download	= Carbon::create($row["date_download"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
-			// $this->date_delete		= Carbon::create($row["date_delete"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
-			// $this->date_modify		= Carbon::create($row["date_modify"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
+			// $this->date_delete	= Carbon::create($row["date_delete"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
+			// $this->date_modify	= Carbon::create($row["date_modify"]->format("Y-m-d H:i:s.u"), "Europe/Prague");
 			$this->is_loaded		= true;
 		}
 
@@ -95,11 +95,11 @@ class StorageTree extends Storage
 	public function save(): bool
 	{
 		$data = [
-		//	"treeID"		=> $tree_id === 0 ? null : $this->tree_id,			// INT(11) UNSIGNED, AUTO_INCREMENT
-			"parentID"		=> $this->parent_id,								// INT(11)
-			"ownerID"		=> $this->owner_id,									// INT(11)
+		//	"tree_id"		=> $tree_id === 0 ? null : $this->tree_id,			// INT(11) UNSIGNED, AUTO_INCREMENT
+			"parent_id"		=> $this->parent_id,								// INT(11)
+			"owner_id"		=> $this->owner_id,									// INT(11)
 			"name"			=> $this->name,										// VARCHAR(255)
-			"nameUrl"		=> \Nette\Utils\Strings::Webalize($this->name),		// VARCHAR(255)
+			"name_url"		=> \Nette\Utils\Strings::Webalize($this->name),		// VARCHAR(255)
 			"date_create"	=> $this->date_create->format("Y-m-d H:i:s.u"),		// TIMESTAMP, DEFAULT current_timestamp()
 			"date_download"	=> $this->date_download->format("Y-m-d H:i:s.u"),	// TIMESTAMP, DEFAULT NULL
 			"date_delete"	=> $this->date_delete->format("Y-m-d H:i:s.u"),		// TIMESTAMP, DEFAULT NULL
@@ -108,7 +108,7 @@ class StorageTree extends Storage
 
 		//bdump($data, "StorageTree::save() DATA");
 
-		$result = $this->db->query("UPDATE storage_tree SET", $data, "WHERE treeID = ?", $this->tree_id);
+		$result = $this->db->query("UPDATE storage_tree SET", $data, "WHERE tree_id = ?", $this->tree_id);
 
 		return ($result->getRowCount() == 1);
 	}
@@ -120,15 +120,15 @@ class StorageTree extends Storage
 	 * @param int		$parent_id	ID of parrent folder (0 == ROOT folder)
 	 * @param int		$owner_id	ID of user who own this folder
 	 * 
-	 * @return string				Returns treeID of the new folder or null when error is occoured.
+	 * @return StorageTree			Returns tree_id of the new folder or null when error is occoured.
 	 */
 	public function create(string $name, int $parent_id = 0, int $owner_id = 0)
 	{
 		$data = [
-			"parentID"		=> $parent_id,								// INT(11)
-			"ownerID"		=> $owner_id,								// INT(11)
+			"parent_id"		=> $parent_id,								// INT(11)
+			"owner_id"		=> $owner_id,								// INT(11)
 			"name"			=> $name,									// VARCHAR(255)
-			"nameUrl"		=> \Nette\Utils\Strings::Webalize($name),	// VARCHAR(255)
+			"name_url"		=> \Nette\Utils\Strings::Webalize($name),	// VARCHAR(255)
 		];
 
 		//bdump($data, "StorageTree::create(ARGS)");
@@ -164,7 +164,7 @@ class StorageTree extends Storage
 	 */
 	public function delete()
 	{
-		$this->db->query("DELETE FROM storage_tree WHERE treeID = ?", $this->tree_id);
+		$this->db->query("DELETE FROM storage_tree WHERE tree_id = ?", $this->tree_id);
 
 		return $this->reset();
 	}
@@ -258,40 +258,71 @@ class StorageTree extends Storage
 		$tree_id = $this->tree_id;
 
 		do {
-			$row = $this->db->fetch("SELECT parentID, nameUrl FROM storage_tree WHERE treeID = ? AND ownerID = ?", $tree_id, $this->owner_id);
+			$row = $this->db->fetch("SELECT parent_id, name_url FROM storage_tree WHERE tree_id = ? AND owner_id = ?", $tree_id, $this->owner_id);
 
-			if (!$row || empty($row["nameUrl"])) {
+			if (!$row || empty($row["name_url"])) {
 				return false;
 			}
 
-			$path = "/" . $row["nameUrl"] . $path;
-			$tree_id = $row["parentID"];
+			$path = "/" . $row["name_url"] . $path;
+			$tree_id = $row["parent_id"];
 		}
-		while ($row["parentID"] != 0 && $row);
+		while ($row["parent_id"] != 0 && $row);
 
 		return $path;
 	}
 
-	public function getUrl(string $name, int $parentId = 0, int $ownerId = null): string
+	public function getPathByTreeId(int $tree_id) //: string // TODO: $owner_id !!!
 	{
-		return "/folder/path/is/this";
+		$path = "/"; // Default return
+
+		do {
+			$row = $this->db->fetch("SELECT parent_id, name_url FROM storage_tree WHERE tree_id = ?", $tree_id);
+
+			if (!$row || empty($row["name_url"])) {
+				return false;
+			}
+
+			$path = "/" . $row["name_url"] . $path;
+			$tree_id = $row["parent_id"];
+		}
+		while ($row["parent_id"] != 0 && $row);
+
+		return $path;
+	}
+
+	public function getTreeList(): array // získá info o pod-složkách
+	{
+		if (!$this->is_loaded && ($this->owner_id == 0 || $this->tree_id == 0)) {
+			return [];
+		}
+
+		$result = $this->db->query("SELECT * FROM storage_tree WHERE parent_id = ? AND owner_id = ?", $this->tree_id, $this->owner_id);
+
+		$treeList = [];
+		foreach ($result as $key => $folder) {
+			$treeList[$key] = (array)$folder;
+			$treeList[$key]['full_path'] = $this->getPathByTreeId($folder['tree_id']);
+		}
+
+		return $treeList;
 	}
 
 }
 
 /*
 CREATE TABLE `storage_tree` (
-	`treeID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`parentID` INT(11) NOT NULL DEFAULT '0',
-	`ownerID` INT(11) NOT NULL DEFAULT '0',
+	`tree_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`parent_id` INT(11) NOT NULL DEFAULT '0',
+	`owner_id` INT(11) NOT NULL DEFAULT '0',
 	`name` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
-	`nameUrl` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
+	`name_url` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`date_create` TIMESTAMP NOT NULL DEFAULT current_timestamp() COMMENT 'Datum vytvoreni',
 	`date_download` TIMESTAMP NULL DEFAULT NULL COMMENT 'Datum stazeni',
 	`date_delete` TIMESTAMP NULL DEFAULT NULL COMMENT 'Datum smazani',
 	`date_modify` TIMESTAMP NULL DEFAULT NULL ON UPDATE current_timestamp() COMMENT 'Datum zmeny',
-	PRIMARY KEY (`treeID`) USING BTREE,
-	UNIQUE INDEX `parentID_ownerID_nameUrl` (`parentID`, `ownerID`, `nameUrl`) USING BTREE
+	PRIMARY KEY (`tree_id`) USING BTREE,
+	UNIQUE INDEX `parent_id_owner_id_name_url` (`parent_id`, `owner_id`, `name_url`) USING BTREE
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB

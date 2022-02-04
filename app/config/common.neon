@@ -30,6 +30,7 @@ services:
 	# Model
 	- App\Model\HistoryLog
 	- App\Model\Storage
+	#- App\Model\StorageFiles
 	- App\Model\StorageTree
 
 	# Forms

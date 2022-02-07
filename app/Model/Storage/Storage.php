@@ -58,4 +58,22 @@ class Storage
 
 		return ($counter == $limit) ? str_repeat('f', $size) : $randomCode;
 	}
+
+	public function getOwnerList()
+	{
+		$result = $this->db->query('SELECT id,username,fullname,role FROM user_accounts ORDER BY id ASC');
+
+		$ownerList = [];
+		if ($result->getRowCount() >= 1) {
+			foreach ($result->fetchAll() as $owner) {
+				$ownerList[$owner->id] = [
+					'username' => $owner->username,
+					'fullname' => $owner->fullname,
+					'role'     => $owner->role,
+				];
+			}
+		}
+
+		return $ownerList;
+	}
 }

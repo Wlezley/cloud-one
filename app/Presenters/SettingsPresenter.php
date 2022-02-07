@@ -50,8 +50,14 @@ final class SettingsPresenter extends SecuredPresenter
 			$this->template->testing[$id]['fileList'] = $this->storageTree->getFileList();
 		}
 
+		bdump($this->storageTree->getOwnerList(), "GET OWNER LIST");
+		//$this->template->ownerList = $this->storage->getOwnerList();
 
 
+
+
+
+		// puvodni kod
 		$this->template->seznamUzivatelu = NULL;
 		$this->template->pocetPolozek = 0;
 

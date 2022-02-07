@@ -12,11 +12,11 @@ class StorageTree extends Storage
 	/** @var Nette\Database\Explorer @inject */
 	public $db;
 
-	public int $tree_id;			// TODO: Rename "treeID"	>>	"tree_id"
-	public int $parent_id;			// TODO: Rename "parentID"	>>	"parent_id"
-	public int $owner_id;			// TODO: Rename "ownerID"	>>	"owner_id"
+	public int $tree_id;
+	public int $parent_id;
+	public int $owner_id;
 	public string $name;
-	public string $name_url;		// TODO: Rename "nameUrl"	>>	"name_url"
+	public string $name_url;
 	public Carbon $date_create;
 	public Carbon $date_download;
 	public Carbon $date_delete;

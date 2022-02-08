@@ -24,7 +24,7 @@ final class RouterFactory
 		$router->addRoute('cron/[<hash>/]', 'Cron:default');
 
 		// FILES (Soubory)
-		$router->addRoute('files/', 'Files:default');
+		//$router->addRoute('files/', 'Files:default');
 		$router->addRoute('files/[<path .+>/]', 'Files:directory');
 
 		$router->addRoute('download/[<storageID>/<downloadID>]', 'Files:download');

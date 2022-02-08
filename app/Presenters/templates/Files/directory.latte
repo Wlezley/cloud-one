@@ -20,9 +20,9 @@
 			</div>
 		</div>
 
-		<h2>CLOUD1://{$path}/</h2>
+		<h2>CLOUD1://{if !empty($path)}{$path}/{/if}</h2>
 		{include '../layout/alerts.latte'}
-		{if $fileList}
+		{* {if $fileList} *}
 		<div>
 			<!--table class="col-lg-12 table table-universal" style="border-left: 1px solid #dee2e6; border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;"-->
 			<table class="col-lg-12 table table-universal" style="border: 1px solid #dee2e6;">
@@ -113,7 +113,7 @@
 				</div>
 			</div>
 		</div>
-		{/if}
+		{* {/if} *}
 
 	</div>
 {/block}

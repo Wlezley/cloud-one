@@ -6,6 +6,8 @@ namespace App\Presenters;
 
 use Nette;
 use App\Model;
+use App\Model\StorageTree;
+
 use Nette\Utils\Json;
 use Nette\Utils\Random;
 use Nette\Utils\Strings;
@@ -22,6 +24,10 @@ final class FilesPresenter extends SecuredPresenter
 {
 	/** @var Oli\Form\DropzoneUploaderFactory */
 	private $dropzone;
+
+	/** @var StorageTree @inject */
+	public $storageTree;
+
 
 	public function __construct(DropzoneUploaderFactory $dropzone)
 	{
@@ -71,6 +77,14 @@ final class FilesPresenter extends SecuredPresenter
 		$dropzone->onSuccess[] = function (DropzoneUploader $dropzoneUploader, $storageID, $fileName, $suffix, $size, $hash)
 		{
 			$owner_id = (isset($this->getUser()->id) ? $this->getUser()->id : 0);	// CURRENTLY LOGGED USER ID
+
+			$base = $this->getHttpRequest()->url->basePath . "files";
+			$path = $this->getHttpRequest()->url->path;
+			if (substr($path, 0, strlen($base)) == $base) {
+				$path = substr($path, strlen($base));
+			} else { /* ERROR 404 ?? */ }
+			$tree_id = $this->storageTree->getTreeIdByPath($path, $owner_id);
+
 			$timestampNow = Carbon::now()->format('Y-m-d H:i:s');					// CURRENT TIMESTAMP
 			$downloadID = $this->getRandomCode(16, 'storage_files', 'downloadID');	// DOWNLOAD ID (KEY)
 
@@ -80,7 +94,7 @@ final class FilesPresenter extends SecuredPresenter
 
 			$this->db->table('storage_files')->insert([
 				//'file_id'		=> null,			// (int 11)		AUTO_INCREMENT
-				//'tree_id'		=> null,			// (int 11)		ID složky
+				'tree_id'		=> $tree_id,		// (int 11)		ID složky
 				'owner_id'		=> $owner_id,		// (int 11)		ID majitele souboru - podle tabulky user_accounts (0 = SYSTEM)
 				'fileName'		=> $fileName,		// (varchar512)	Jmeno souboru (orig)
 				'fileMime'		=> $suffix,			// (varchar 64)	Pripona souboru (orig)
@@ -109,8 +123,13 @@ final class FilesPresenter extends SecuredPresenter
 	/** RENDER DEFAULT FILE LIST */
 	public function renderDefault()
 	{
+		$this->template->treeList = null;
 		$this->template->fileList = null;
+
+		$this->template->countFolders = 0;
 		$this->template->countFiles = 0;
+
+		$this->template->path = "/";
 
 		$resultFiles = $this->db->query('SELECT * FROM storage_files WHERE tree_id = 0 ORDER BY fileName ASC');
 		if (($this->template->countFiles = $resultFiles->getRowCount()) >= 1) {
@@ -122,22 +141,11 @@ final class FilesPresenter extends SecuredPresenter
 			return;
 		}
 
-		$this->template->ownerList = array();
-
-		$resultOwners = $this->db->query('SELECT id,username,fullname,role FROM user_accounts ORDER BY id ASC');
-		if ($resultOwners->getRowCount() >= 1) {
-			foreach ($resultOwners->fetchAll() as $owner) {
-				$this->template->ownerList[$owner->id] = [
-					'username' => $owner->username,
-					'fullname' => $owner->fullname,
-					'role'     => $owner->role,
-				];
-			}
-		}
+		$this->template->ownerList = $this->storageTree->getOwnerList();
 	}
 
 	/** RENDER FILE LIST FROM DIRECTORY (WITH SUB-DIRECTORIES) */
-	public function renderDirectory($path)
+	public function renderDirectory($path = "")
 	{
 		//$this->db->query("INSERT INTO `storage_tree` (`parent_id`, `owner_id`, `name`, `name_url`) VALUES (4, 1, 'test 2', 'test-2')");
 
@@ -148,12 +156,13 @@ final class FilesPresenter extends SecuredPresenter
 		$this->template->countFiles = 0;
 		$this->template->path = $path;
 
-		$pathArray = [];
-		foreach (explode("/", $path) as $key => $dir) {
-			if (!empty($dir)) {
-				$pathArray[] = Strings::webalize($dir);
-			}
-		}
+		// $pathArray = [];
+		// foreach (explode("/", $path) as $key => $dir) {
+		// 	if (!empty($dir)) {
+		// 		$pathArray[] = Strings::webalize($dir);
+		// 	}
+		// }
+		$pathArray = explode("/", trim($path, "/"));
 		bdump($pathArray, "URL / PATH ARRAY");
 
 		$owner_id = 1;
@@ -168,7 +177,9 @@ final class FilesPresenter extends SecuredPresenter
 			$upDir = rtrim($lastPath, "/");
 
 			if (!$folderInfo) {
-				$this->redirect("this", ["path" => rtrim($lastPath, "/")]);
+				if (!empty($lastPath)) {
+					$this->redirect("this", ["path" => rtrim($lastPath, "/")]);
+				}
 				break;
 			}
 
@@ -193,31 +204,28 @@ final class FilesPresenter extends SecuredPresenter
 		}
 
 		// Files
-		$resultFiles = $this->db->query('SELECT * FROM storage_files ORDER BY fileName ASC');
-		if (($this->template->countFiles = $resultFiles->getRowCount()) >= 1) {
-			$this->template->fileList = $resultFiles->fetchAll();
-		}
+		// $resultFiles = $this->db->query('SELECT * FROM storage_files ORDER BY fileName ASC');
+		// if (($this->template->countFiles = $resultFiles->getRowCount()) >= 1) {
+		// 	$this->template->fileList = $resultFiles->fetchAll();
+		// }
+
+		$this->storageTree->setOwnerID($owner_id);
+		$this->storageTree->setTreeID($parent_id);
+		$this->template->fileList = $this->storageTree->getFileList();
 
 		// Empty folder
 		if (empty($this->template->treeList) && empty($this->template->fileList)) {
 			$this->flashMessage('Složka je prázdná.', 'info');
-			return;
+			// return;
 		}
 
-		$this->template->ownerList = array();
+		$this->template->ownerList = $this->storageTree->getOwnerList();
+
 		//$this->template->upDir = rtrim($lastPath, "/");
 		$this->template->upDir = $upDir;
 
-		$resultOwners = $this->db->query('SELECT id,username,fullname,role FROM user_accounts ORDER BY id ASC');
-		if ($resultOwners->getRowCount() >= 1) {
-			foreach ($resultOwners->fetchAll() as $owner) {
-				$this->template->ownerList[$owner->id] = [
-					'username' => $owner->username,
-					'fullname' => $owner->fullname,
-					'role'     => $owner->role,
-				];
-			}
-		}
+		// ID of actual folder
+		$this->template->tree_id = 15; //$parent_id;
 	}
 
 	/** Download file by storageID ans downloadID (hash)

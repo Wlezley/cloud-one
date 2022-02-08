@@ -293,6 +293,40 @@ class StorageTree extends Storage
 		return $path;
 	}
 
+	public function getTreeIdByPath(string $path, int $owner_id) //: string // TODO: $owner_id !!!
+	{
+		$pathArray = explode("/", trim($path, "/"));
+		bdump($pathArray, "URL / PATH ARRAY (StorageTree)");
+
+		$owner_id = 1;
+		$parent_id = 0;
+
+		$treeMap = [];
+		$lastPath = "";
+		foreach ($pathArray as $key => $name_url) {
+			$folder = $this->db->query('SELECT * FROM storage_tree WHERE owner_id = ? AND parent_id = ? AND name_url = ? LIMIT 1', $owner_id, $parent_id, $name_url);
+			$folderInfo = $folder->fetch();
+
+			if (!$folderInfo) {
+				if (!empty($lastPath)) {
+					return 0; // root directory
+				}
+				break;
+			}
+
+			$treeMap[$key] = [
+				"parent_id" => $parent_id,
+				"tree_id" => $folderInfo['tree_id'],
+			];
+
+			$lastPath .= $folderInfo['name_url'] . "/";
+			$parent_id = $folderInfo['tree_id'];
+		}
+		bdump($treeMap, "URL / TREE MAP (StorageTree)");
+
+		return $parent_id;
+	}
+
 	/** List of sub-folders in the folder */
 	public function getTreeList(): array
 	{

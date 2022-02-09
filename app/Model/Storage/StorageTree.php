@@ -167,6 +167,7 @@ class StorageTree extends Storage
 	public function delete()
 	{
 		$this->db->query("DELETE FROM storage_tree WHERE tree_id = ?", $this->tree_id);
+		$this->db->query("DELETE FROM storage_files WHERE tree_id = ?", $this->tree_id);
 
 		return $this->reset();
 	}
@@ -278,17 +279,19 @@ class StorageTree extends Storage
 	{
 		$path = "/"; // Default return
 
-		do {
-			$row = $this->db->fetch("SELECT parent_id, name_url FROM storage_tree WHERE tree_id = ?", $tree_id);
+		if ($tree_id != 0) {
+			do {
+				$row = $this->db->fetch("SELECT parent_id, name_url FROM storage_tree WHERE tree_id = ?", $tree_id);
 
-			if (!$row || empty($row["name_url"])) {
-				return false;
+				if (!$row || empty($row["name_url"])) {
+					return false;
+				}
+
+				$path = "/" . $row["name_url"] . $path;
+				$tree_id = $row["parent_id"];
 			}
-
-			$path = "/" . $row["name_url"] . $path;
-			$tree_id = $row["parent_id"];
+			while ($row["parent_id"] != 0 && $row);
 		}
-		while ($row["parent_id"] != 0 && $row);
 
 		return $path;
 	}

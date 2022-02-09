@@ -147,8 +147,6 @@ final class FilesPresenter extends SecuredPresenter
 	/** RENDER FILE LIST FROM DIRECTORY (WITH SUB-DIRECTORIES) */
 	public function renderDirectory($path = "")
 	{
-		//$this->db->query("INSERT INTO `storage_tree` (`parent_id`, `owner_id`, `name`, `name_url`) VALUES (4, 1, 'test 2', 'test-2')");
-
 		$this->template->treeList = null;
 		$this->template->fileList = null;
 
@@ -156,21 +154,17 @@ final class FilesPresenter extends SecuredPresenter
 		$this->template->countFiles = 0;
 		$this->template->path = $path;
 
-		// $pathArray = [];
-		// foreach (explode("/", $path) as $key => $dir) {
-		// 	if (!empty($dir)) {
-		// 		$pathArray[] = Strings::webalize($dir);
-		// 	}
-		// }
 		$pathArray = explode("/", trim($path, "/"));
-		bdump($pathArray, "URL / PATH ARRAY");
+		// bdump($pathArray, "URL / PATH ARRAY");
 
 		$owner_id = 1;
 		$parent_id = 0;
+		$tree_id = 0;
 
 		$treeMap = [];
 		$upDir = "";
 		$lastPath = "";
+
 		foreach ($pathArray as $key => $name_url) {
 			$folder = $this->db->query('SELECT * FROM storage_tree WHERE owner_id = ? AND parent_id = ? AND name_url = ? LIMIT 1', $owner_id, $parent_id, $name_url);
 			$folderInfo = $folder->fetch();
@@ -190,8 +184,14 @@ final class FilesPresenter extends SecuredPresenter
 
 			$lastPath .= $folderInfo['name_url'] . "/";
 			$parent_id = $folderInfo['tree_id'];
+
+			if ($parent_id != 0) {
+				$tree_id = $parent_id;
+			} else {
+				break;
+			}
 		}
-		bdump($treeMap, "URL / TREE MAP");
+		// bdump($treeMap, "URL / TREE MAP");
 
 		// Folders
 		$this->template->treeList = [];
@@ -218,6 +218,10 @@ final class FilesPresenter extends SecuredPresenter
 			$this->flashMessage('Složka je prázdná.', 'info');
 			// return;
 		}
+		
+		if (!$this->template->flashes) {
+			$this->flashMessage('&nbsp;', 'none');
+		}
 
 		$this->template->ownerList = $this->storageTree->getOwnerList();
 
@@ -225,7 +229,7 @@ final class FilesPresenter extends SecuredPresenter
 		$this->template->upDir = $upDir;
 
 		// ID of actual folder
-		$this->template->tree_id = 15; //$parent_id;
+		$this->template->tree_id = $tree_id;
 	}
 
 	/** Download file by storageID ans downloadID (hash)
@@ -465,5 +469,55 @@ final class FilesPresenter extends SecuredPresenter
 
 		$this->flashMessage($outputMessage[0], $outputMessage[1]);
 		$this->redirect('Files:default');
+	}
+
+	/* ######################################## TREE ACTIONS ######################################## */
+
+	/** Create new folder
+	 * @param	int		$parent_id			Current folder ID
+	 * @param	string	$name				New folder name
+	 */
+	public function actionAddFolder(int $parent_id, string $name = "test"): void
+	{
+		$parent_path = ""; 
+		$this->storageTree->load($parent_id);
+
+		if ($this->storageTree->isLoaded()) {
+			$parent_path = trim($this->storageTree->getPathByTreeId($parent_id), "/");
+			$this->storageTree->create($name, $parent_id, $this->storageTree->getOwnerID());
+			$this->flashMessage('Složka "' . $name . '" byla vytvořena.', 'success');
+		} else if ($parent_id == 0) {
+			$this->storageTree->create($name, $parent_id, 1); // TODO: $owner_id !!!
+			$this->flashMessage('Složka "' . $name . '" byla vytvořena (PARENT ID == 0).', 'success');
+		} else {
+			$this->flashMessage('Při vytváření složky došlo k chybě!', 'danger');
+		}
+
+		$this->redirect('Files:directory', $parent_path);
+	}
+
+	/** Delete folder
+	 * @param	int		$tree_id			ID of folder to delete
+	 */
+	public function actionDeleteFolder(int $tree_id): void
+	{
+		$parent_path = "";
+		$this->storageTree->load($tree_id);
+
+		if ($this->storageTree->isLoaded()) {
+			$parent_id = $this->storageTree->getParentID();
+
+			if ($parent_id != 0) {
+				$parent_path = trim($this->storageTree->getPathByTreeId($parent_id), "/");
+			}
+
+			$name = $this->storageTree->getName();
+			$this->storageTree->delete();
+			$this->flashMessage('Složka "' . $name . '" byla odstraněna.', 'success');
+		} else {
+			$this->flashMessage('Složka nebyla nalezena!', 'danger');
+		}
+
+		$this->redirect('Files:directory', $parent_path);
 	}
 }

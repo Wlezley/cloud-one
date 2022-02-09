@@ -52,8 +52,7 @@
 					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}"></td>
 					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}"></td>
 					<td style="text-align: center; border-left: 1px solid #dee2e6;">
-						<a href="{*link Files:delete, storageID => $file['storageID']*}" title="Smazat složku"
-							class="btn table-action-button button-red delete-action" data-filename="{*$file['fileName']*}">
+						<a href="#" onclick="return false;" class="btn table-action-button button-gray">
 							<i class="fas fa-trash-alt"></i>
 						</a>
 					</td>
@@ -73,8 +72,8 @@
 					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}">{$tree['date_create']|date:'%d.%m.%Y %H:%M'}</td>
 					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}">{$owner['fullname']}</td>
 					<td style="text-align: center; border-left: 1px solid #dee2e6;">
-						<a href="{*link Files:delete, storageID => $file['storageID']*}" title="Smazat složku"
-							class="btn table-action-button button-red delete-action" data-filename="{*$file['fileName']*}">
+						<a href="{link Files:deleteFolder, tree_id => $tree['tree_id']}" title="Smazat složku"
+							class="btn table-action-button button-red delete-folder-action" data-foldername="{$tree['name']}">
 							<i class="fas fa-trash-alt"></i>
 						</a>
 					</td>
@@ -107,9 +106,14 @@
 			<div class="row" style="padding-bottom: 15px;">
 				<div class="col-lg-12">
 					<span id="download-all-selected" class='btn span-action-button button-green'><i class="fas fa-cloud-download-alt"></i> STÁHNOUT</span>
-					<span id="delete-all-selected"  class='btn span-action-button button-red'><i class="fas fa-trash-alt"></i> SMAZAT</span>
+					<span id="delete-all-selected" class='btn span-action-button button-red'><i class="fas fa-trash-alt"></i> SMAZAT</span>
 					<!--span class='btn span-action-button-oragne button'><i class="fas fa-download"></i> STÁHNOUT</span>
 					<span class='btn span-action-button-gray button'><i class="fas fa-file-download"></i> STÁHNOUT</span-->
+
+					<a href="{link Files:addFolder, parent_id => $tree_id}" class="fl-oat-right" title="Nová složka">
+						<span id="delete-all-selected" class='btn span-action-button button-blue'>
+						<i class="fas fa-folder-plus"></i> Nová složka</span>
+					</a>
 				</div>
 			</div>
 		</div>
@@ -130,6 +134,10 @@
 
 		$(".delete-action").click(function() {
 			return confirm('POZOR: Soubor "'+$(this).data("filename")+'" bude ODSTRANĚN.\nChcete pokračovat?');
+		});
+
+		$(".delete-folder-action").click(function() {
+			return confirm('POZOR: Složka "'+$(this).data("foldername")+'" bude ODSTRANĚNA.\nChcete pokračovat?');
 		});
 
 		$(".file-selector").click(function() {

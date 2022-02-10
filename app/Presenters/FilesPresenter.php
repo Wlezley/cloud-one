@@ -228,8 +228,9 @@ final class FilesPresenter extends SecuredPresenter
 		//$this->template->upDir = rtrim($lastPath, "/");
 		$this->template->upDir = $upDir;
 
-		// ID of actual folder
+		// ID and path of actual folder
 		$this->template->tree_id = $tree_id;
+		$this->template->tree_path = "/" . $lastPath;
 	}
 
 	/** Download file by storageID ans downloadID (hash)
@@ -474,26 +475,26 @@ final class FilesPresenter extends SecuredPresenter
 	/* ######################################## TREE ACTIONS ######################################## */
 
 	/** Create new folder
-	 * @param	int		$parent_id			Current folder ID
+	 * @param	int		$tree_id			Current folder ID
 	 * @param	string	$name				New folder name
 	 */
-	public function actionAddFolder(int $parent_id, string $name = "test"): void
+	public function actionAddFolder(int $tree_id, string $name): void
 	{
-		$parent_path = ""; 
-		$this->storageTree->load($parent_id);
+		$tree_path = ""; 
+		$this->storageTree->load($tree_id);
 
 		if ($this->storageTree->isLoaded()) {
-			$parent_path = trim($this->storageTree->getPathByTreeId($parent_id), "/");
-			$this->storageTree->create($name, $parent_id, $this->storageTree->getOwnerID());
+			$tree_path = trim($this->storageTree->getPathByTreeId($tree_id), "/");
+			$this->storageTree->create($name, $tree_id, $this->storageTree->getOwnerID());
 			$this->flashMessage('Složka "' . $name . '" byla vytvořena.', 'success');
-		} else if ($parent_id == 0) {
-			$this->storageTree->create($name, $parent_id, 1); // TODO: $owner_id !!!
+		} else if ($tree_id == 0) {
+			$this->storageTree->create($name, $tree_id, 1); // TODO: $owner_id !!!
 			$this->flashMessage('Složka "' . $name . '" byla vytvořena (PARENT ID == 0).', 'success');
 		} else {
 			$this->flashMessage('Při vytváření složky došlo k chybě!', 'danger');
 		}
 
-		$this->redirect('Files:directory', $parent_path);
+		$this->redirect('Files:directory', $tree_path);
 	}
 
 	/** Delete folder

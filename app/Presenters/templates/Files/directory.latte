@@ -26,9 +26,10 @@
 		<div>
 			<!--table class="col-lg-12 table table-universal" style="border-left: 1px solid #dee2e6; border-right: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;"-->
 			<table class="col-lg-12 table table-universal" style="border: 1px solid #dee2e6;">
+				{* TABLE HEADER *}
 				<tr>
 					<th style="text-align: right; width: 5px; padding-right: 0px;">
-						<input type="checkbox" id="select-all-files" name="select-all-files">
+						<input type="checkbox" id="select-all-files" name="select-all-files" autocomplete="off">
 					</th>
 					<th style="text-align: center; width: 55px;"><!-- IKONA --></th>
 					<th style="text-align: left;">Jméno souboru</th>
@@ -39,10 +40,11 @@
 								border-left: 1px solid #dee2e6; {*border-right: 1px solid #dee2e6;*}
 								padding-right: 0; padding-left: 0;"><i class="fas fa-cogs"></i></th>
 				</tr>
+				{* FOLDER UP *}
 				{capture $downloadLink}{link Files:directory $upDir}{/capture}
 				<tr class="table-row-hover">
 					<td style="text-align: center; width: 5px; padding-right: 0px;">
-						{*<input type="checkbox" class="file-selector" data-storageid="TREE_{$tree['name_url']}">*}
+						{*<input type="checkbox" class="file-selector" data-storageid="TREE_{$tree['name_url']}" autocomplete="off">*}
 					</td>
 					<td style="text-align: center;">
 						<img style="width:30px; height:30px;" src="{$baseUrl}/img/file-types/unknown.png">
@@ -57,12 +59,13 @@
 						</a>
 					</td>
 				</tr>
+			{* FOLDERS *}
 			{foreach $treeList as $tree}
 				{capture $downloadLink}{link Files:directory $tree['name_url']}{/capture}
 				{var $owner = $ownerList[$tree['owner_id']]}
 				<tr class="table-row-hover">
 					<td style="text-align: center; width: 5px; padding-right: 0px;">
-						{*<input type="checkbox" class="file-selector" data-storageid="TREE_{$tree['name_url']}">*}
+						{*<input type="checkbox" class="file-selector" data-storageid="TREE_{$tree['name_url']}" autocomplete="off">*}
 					</td>
 					<td style="text-align: center;">
 						<img style="width:30px; height:30px;" src="{$baseUrl}/img/file-types/unknown.png">
@@ -79,12 +82,13 @@
 					</td>
 				</tr>
 			{/foreach}
+			{* FILES *}
 			{foreach $fileList as $file}
 				{capture $downloadLink}{link Files:download $file['storageID'], $file['downloadID']}{/capture}
 				{var $owner = $ownerList[$file['owner_id']]}
 				<tr class="table-row-hover">
 					<td style="text-align: center; width: 5px; padding-right: 0px;">
-						<input type="checkbox" class="file-selector" data-storageid="{$file['storageID']}">
+						<input type="checkbox" class="file-selector" data-storageid="{$file['storageID']}" autocomplete="off">
 					</td>
 					<td style="text-align: center;">
 						<img style="width:30px; height:30px;" src="{$baseUrl}/img/file-types/{$file['fileMime']}.png">
@@ -103,6 +107,7 @@
 			{/foreach}
 			</table>
 
+			{* BOTTOM NAVIGATION *}
 			<div class="row" style="padding-bottom: 15px;">
 				<div class="col-lg-12">
 					<span id="download-all-selected" class='btn span-action-button button-green'><i class="fas fa-cloud-download-alt"></i> STÁHNOUT</span>
@@ -110,12 +115,55 @@
 					<!--span class='btn span-action-button-oragne button'><i class="fas fa-download"></i> STÁHNOUT</span>
 					<span class='btn span-action-button-gray button'><i class="fas fa-file-download"></i> STÁHNOUT</span-->
 
-					<a href="{link Files:addFolder, parent_id => $tree_id}" class="fl-oat-right" title="Nová složka">
-						<span id="delete-all-selected" class='btn span-action-button button-blue'>
+					{* <a href="{link Files:addFolder, tree_id => $tree_id}" class="fl-oat-right" title="Nová složka">
+						<span class='btn span-action-button button-blue'>
 						<i class="fas fa-folder-plus"></i> Nová složka</span>
-					</a>
+					</a> *}
+
+					<button type="button"
+							data-toggle="modal"
+							data-target="#addFolder"
+							data-tree-id="{$tree_id}"
+							data-tree-path="{$tree_path}"
+							class="btn span-action-button button-blue">
+						<span><i class="fas fa-folder-plus"></i> Nová složka</span>
+					</button>
+
 				</div>
 			</div>
+
+			{* MODAL TEST ---->> *}
+			<div class="modal fade" id="addFolder" tabindex="-1" role="dialog" aria-labelledby="addFolderLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="addFolderLabel">Nová složka</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<form>
+								{* <input type="hidden" class="form-control" id="tree_id"> *}
+								<div class="form-group">
+									<label for="tree_path" class="col-form-label">Umístění:</label>
+									<input type="text" class="form-control" id="tree_path" value="{$tree_path}" disabled>
+								</div>
+								<div class="form-group">
+									<label for="folder_name" class="col-form-label">Název složky:</label>
+									<input type="text" class="form-control" id="folder_name" autocomplete="off">
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+							<button type="button" class="btn btn-primary" id="addFolder_confirm">Vytvořit složku</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			{* <<---- MODAL TEST *}
+
 		</div>
 		{* {/if} *}
 
@@ -127,6 +175,33 @@
 	<script src="{$baseUrl}/libs/dropzone-5.7.0/dist/dropzone.js?v=2021112100"></script>
 	<script src="{$baseUrl}/libs/dropzone-uploader/dropzoneUploader.js?v=2021112100"></script>
 	<script>
+	$('#addFolder').on('show.bs.modal', function (event) {
+		var button = $(event.relatedTarget);
+		var tree_id = button.data('tree-id');
+		var tree_path = button.data('tree-path');
+
+		//var modal = $(this);
+		//modal.find('.modal-title').text('Nová složka (tree_id: ' + tree_id + ')');
+		//modal.find('#tree_id').val(tree_id);
+
+		$('#addFolder_confirm').click(function() {
+			var folder_name = $('#folder_name').val();
+			window.location = {$baseUrl} + "/add-folder/" + tree_id + "/" + folder_name;
+
+			/*$.ajax({ url: {$baseUrl} + "/add-folder/" + tree_id + "/?name=nevim",
+				type: "GET",
+				data: null,
+				success: function (response) { 
+					//window.location = {$baseUrl} + "/files";
+				}
+			});*/
+		});
+	})
+
+	$('#addFolder').on('shown.bs.modal', function () {
+		$('#folder_name').trigger('focus').val("");
+	})
+
 	jQuery(document).ready(function($) {
 		$(".clickable-row").click(function() {
 			window.location = $(this).data("href");
@@ -175,6 +250,7 @@
 
 		$("#delete-all-selected").click(function() {
 			var fileList = $('.file-selector:checkbox:checked');
+			//var location = $(this);
 
 			if (fileList.length > 0 && confirm('POZOR: Vybrané soubory (' + fileList.length + ') budou ODSTRANĚNY.\nChcete pokračovat?')) {
 				var storageID_List = [];
@@ -189,7 +265,7 @@
 					type: "GET",
 					data: null,
 					success: function (response) {
-						//window.location = {$baseUrl} + "/files";
+						//window.location = location;
 					}
 				});*/
 

@@ -33,7 +33,7 @@ final class RouterFactory
 		$router->addRoute('delete/[<storageID>]', 'Files:delete');
 		$router->addRoute('delete-bulk/[<storageID_List>]', 'Files:deleteBulk');
 		//$router->addRoute('user-folder/[<userid>]', 'Files:userfolder');
-		$router->addRoute('add-folder/[<parent_id>]', 'Files:addFolder');
+		$router->addRoute('add-folder/[<tree_id>/<name>]', 'Files:addFolder');
 		$router->addRoute('delete-folder/[<tree_id>]', 'Files:deleteFolder');
 
 		// UPLOAD

@@ -159,7 +159,7 @@
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
-							<button type="button" class="btn btn-primary" id="addFolder_confirm">Vytvořit složku</button>
+							<button type="submit" class="btn btn-primary" id="addFolder_confirm">Vytvořit složku</button>
 						</div>
 					</div>
 				</div>
@@ -189,6 +189,7 @@
 		$('#addFolder_confirm').click(function() {
 			var folder_name = $('#folder_name').val();
 			window.location = {$baseUrl} + "/add-folder/" + tree_id + "/" + folder_name;
+			// window.location = {$baseUrl} + "/add-folder/" + tree_id + "/" + btoa(unescape(encodeURIComponent(folder_name)));
 
 			/*$.ajax({ url: {$baseUrl} + "/add-folder/" + tree_id + "/?name=nevim",
 				type: "GET",

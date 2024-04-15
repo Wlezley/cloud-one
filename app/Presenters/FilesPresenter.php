@@ -482,6 +482,7 @@ final class FilesPresenter extends SecuredPresenter
 	{
 		$tree_path = ""; 
 		$this->storageTree->load($tree_id);
+		//$name = base64_decode($name);
 
 		if ($this->storageTree->isLoaded()) {
 			$tree_path = trim($this->storageTree->getPathByTreeId($tree_id), "/");

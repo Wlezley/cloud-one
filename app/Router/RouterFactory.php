@@ -20,7 +20,7 @@ final class RouterFactory
         $router->addRoute('logout/', 'Homepage:logout');
 
         // CRON
-        $router->addRoute('cron/[<hash>/]', 'Cron:default');
+        $router->addRoute('cron/[<action>/]<hash>/', 'Cron:default');
 
         // FILES
         //$router->addRoute('files/', 'Files:default');

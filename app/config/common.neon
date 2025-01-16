@@ -16,14 +16,16 @@ session:
 
 di:
     export:
-        parameters: no
+        parameters: yes
         tags: no
 
 
 database:
-    dsn: 'mysql:host=%database.host%;dbname=%database.dbmane%'
     user: %database.user%
     password: %database.password%
+    dsn: "mysql:host=%database.host%;port=%database.port%;dbname=%database.name%"
+    options:
+        lazy: true
 
 
 services:

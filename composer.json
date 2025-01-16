@@ -21,7 +21,8 @@
     "latte/latte": "^3.0",
     "tracy/tracy": "^2.6",
     "olicek/dropzone-uploader": "dev-master",
-    "nesbot/carbon": "^3.8"
+    "nesbot/carbon": "^3.8",
+    "robmorgan/phinx": "^0.16.6"
   },
   "require-dev": {
     "nette/tester": "^2.0",

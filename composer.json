@@ -5,23 +5,23 @@
 	"type": "project",
 	"license": ["MIT", "BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
 	"require": {
-		"php": ">= 7.1",
-		"nette/application": "^3.0",
+		"php": ">= 8.2",
+		"nette/application": "^3.2",
 		"nette/bootstrap": "^3.0",
-		"nette/caching": "^3.0",
-		"nette/database": "^3.0",
-		"nette/di": "^3.0",
-		"nette/finder": "^2.5",
-		"nette/forms": "^3.0",
-		"nette/http": "^3.0",
-		"nette/mail": "^3.0",
-		"nette/robot-loader": "^3.0",
-		"nette/security": "^3.0",
-		"nette/utils": "^3.0",
-		"latte/latte": "^2.5",
+		"nette/caching": "^3.3",
+		"nette/database": "^3.2",
+		"nette/di": "^3.2",
+		"nette/finder": "^3.0",
+		"nette/forms": "^3.2",
+		"nette/http": "^3.3",
+		"nette/mail": "^4.0",
+		"nette/robot-loader": "^4.0",
+		"nette/security": "^3.2",
+		"nette/utils": "^4.0",
+		"latte/latte": "^3.0",
 		"tracy/tracy": "^2.6",
 		"olicek/dropzone-uploader": "dev-master",
-		"nesbot/carbon": "^2.42"
+		"nesbot/carbon": "^3.8"
 	},
 	"require-dev": {
 		"nette/tester": "^2.0",
@@ -36,6 +36,9 @@
 	"config": {
 		"allow-plugins": {
 			"symfony/thanks": false
+		},
+		"platform": {
+			"php": "8.2"
 		}
 	}
 }

@@ -8,54 +8,54 @@ use App\Model\StorageTree;
 
 final class SettingsPresenter extends SecuredPresenter
 {
-	/** @var StorageTree @inject */
-	public $storageTree;
+    /** @var StorageTree @inject */
+    public $storageTree;
 
-	public function startup(): void
-	{
-		parent::startup();
-	}
+    public function startup(): void
+    {
+        parent::startup();
+    }
 
-	public function renderDefault(): void
-	{
-		$this->flashMessage('Nastavení cloudu je v rekonstrukci.', 'warning');
+    public function renderDefault(): void
+    {
+        $this->flashMessage('Nastavení cloudu je v rekonstrukci.', 'warning');
 
-		// DEBUG ONLY ---->>
-		// $this->storageTree->load(0);
-		// $this->template->debug = $this->storageTree->getPath();
+        // DEBUG ONLY ---->>
+        // $this->storageTree->load(0);
+        // $this->template->debug = $this->storageTree->getPath();
 
-		$this->storageTree->setOwnerID(1);
-		// bdump($this->storageTree->getTreeList(), "GET TREE LIST");
-		// bdump($this->storageTree->getFileList(), "GET FILE LIST");
-		// <<---- DEBUG ONLY
+        $this->storageTree->setOwnerID(1);
+        // bdump($this->storageTree->getTreeList(), "GET TREE LIST");
+        // bdump($this->storageTree->getFileList(), "GET FILE LIST");
+        // <<---- DEBUG ONLY
 
-		$testings = [0, 4, 6, 14, 15];
+        $testings = [0, 4, 6, 14, 15];
 
-		foreach ($testings as $id) {
-			$this->storageTree->load($id);
-			$this->template->testing[$id]['treeList'] = $this->storageTree->getTreeList();
-			$this->template->testing[$id]['fileList'] = $this->storageTree->getFileList();
-		}
+        foreach ($testings as $id) {
+            $this->storageTree->load($id);
+            $this->template->testing[$id]['treeList'] = $this->storageTree->getTreeList();
+            $this->template->testing[$id]['fileList'] = $this->storageTree->getFileList();
+        }
 
-		bdump($this->storageTree->getOwnerList(), "GET OWNER LIST");
-		// $this->template->ownerList = $this->storage->getOwnerList();
-
-
+        bdump($this->storageTree->getOwnerList(), "GET OWNER LIST");
+        // $this->template->ownerList = $this->storage->getOwnerList();
 
 
-		// puvodni kod
-		$this->template->seznamUzivatelu = NULL;
-		$this->template->pocetPolozek = 0;
 
-		$result = $this->db->query('SELECT * FROM user_accounts');
-		if($result->getRowCount() >= 1) {
-			$this->template->seznamUzivatelu = $result->fetchAll();
-		}
 
-		if(!isset($this->template->seznamUzivatelu) || $this->template->seznamUzivatelu == NULL) {
-			$this->flashMessage('Seznam uživatelů je prázdný.', 'info');
-			return;
-		}
-		$this->template->pocetPolozek = count($this->template->seznamUzivatelu);
-	}
+        // puvodni kod
+        $this->template->seznamUzivatelu = NULL;
+        $this->template->pocetPolozek = 0;
+
+        $result = $this->db->query('SELECT * FROM user_accounts');
+        if($result->getRowCount() >= 1) {
+            $this->template->seznamUzivatelu = $result->fetchAll();
+        }
+
+        if(!isset($this->template->seznamUzivatelu) || $this->template->seznamUzivatelu == NULL) {
+            $this->flashMessage('Seznam uživatelů je prázdný.', 'info');
+            return;
+        }
+        $this->template->pocetPolozek = count($this->template->seznamUzivatelu);
+    }
 }

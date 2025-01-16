@@ -7,10 +7,10 @@ use Nette\Database\Explorer;
 
 class BasePresenter extends Nette\Application\UI\Presenter
 {
-	/** @var Explorer @inject */
-	public $db;
+    /** @var Explorer @inject */
+    public $db;
 
-	public function __construct()
-	{
-	}
+    public function __construct()
+    {
+    }
 }

@@ -6,12 +6,12 @@ namespace App\Presenters;
 
 class UnsecuredPresenter extends BasePresenter
 {
-	public function startup(): void
-	{
-		parent::startup();
+    public function startup(): void
+    {
+        parent::startup();
 
-		if ($this->user->isLoggedIn()) {
-			$this->redirect('Homepage:');
-		}
-	}
+        if ($this->user->isLoggedIn()) {
+            $this->redirect('Homepage:');
+        }
+    }
 }

@@ -1,59 +1,59 @@
 php:
-	date.timezone: Europe/Prague 
+    date.timezone: Europe/Prague
 
 
 application:
-	errorPresenter: Error
-	mapping:
-		*: App\*Module\Presenters\*Presenter
+    errorPresenter: Error
+    mapping:
+        *: App\*Module\Presenters\*Presenter
 
 
 session:
-	autoStart: true
-	expiration: 14 days
-	debugger: false
+    autoStart: true
+    expiration: 14 days
+    debugger: false
 
 
 di:
-	export:
-		parameters: no
-		tags: no
+    export:
+        parameters: no
+        tags: no
 
 
 database:
-	dsn: 'mysql:host=%database.host%;dbname=%database.dbmane%'
-	user: %database.user%
-	password: %database.password%
+    dsn: 'mysql:host=%database.host%;dbname=%database.dbmane%'
+    user: %database.user%
+    password: %database.password%
 
 
 services:
-	# Model
-	- App\Model\HistoryLog
-	- App\Model\Storage
-	- App\Model\StorageFiles
-	- App\Model\StorageTree
+    # Model
+    - App\Model\HistoryLog
+    - App\Model\Storage
+    - App\Model\StorageFiles
+    - App\Model\StorageTree
 
-	# Forms
-	- App\Forms\SignInFormFactory
+    # Forms
+    - App\Forms\SignInFormFactory
 
-	# Presenters
-	- App\Presenters\CronPresenter(%cron.hash%)
+    # Presenters
+    - App\Presenters\CronPresenter(%cron.hash%)
 
-	latte.latteFactory:
-		setup:
-			- setTempDirectory(null)
+    latte.latteFactory:
+        setup:
+            - setTempDirectory(null)
 
-	router: App\Router\RouterFactory::createRouter
-	authenticator: App\Model\User\Authenticator
+    router: App\Router\RouterFactory::createRouter
+    authenticator: App\Model\User\Authenticator
 
 extensions:
-	dropzone: Oli\Form\DropzoneUploaderExtension
+    dropzone: Oli\Form\DropzoneUploaderExtension
 
 dropzone:
-	wwwDir: 'data'
-	path: 'data'
-	settings:
-		maxFiles: 50
-		fileSizeLimit: 5000000000
-		ajax: true
-		onSuccess: 'this'
+    wwwDir: 'data'
+    path: 'data'
+    settings:
+        maxFiles: 50
+        fileSizeLimit: 5000000000
+        ajax: true
+        onSuccess: 'this'

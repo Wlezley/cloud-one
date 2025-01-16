@@ -9,26 +9,26 @@ use Nette;
 
 class SignPresenter extends UnsecuredPresenter
 {
-	/** @var SignInFormFactory @inject */
-	public $signInForm;
+    /** @var SignInFormFactory @inject */
+    public $signInForm;
 
-	public function renderDefault(): void
-	{
-		$this->redrawControl();
-	}
+    public function renderDefault(): void
+    {
+        $this->redrawControl();
+    }
 
-	protected function createComponentSignInForm(): Nette\Application\UI\Form
-	{
-		$form = $this->signInForm->create();
+    protected function createComponentSignInForm(): Nette\Application\UI\Form
+    {
+        $form = $this->signInForm->create();
 
-		$form->onSuccess[] = function () {
-			$this->redirect('Homepage:');
-		};
+        $form->onSuccess[] = function () {
+            $this->redirect('Homepage:');
+        };
 
-		$form->onError[] = function () {
-			$this->flashMessage('Nesprávné přihlašovací údaje', 'danger');
-		};
+        $form->onError[] = function () {
+            $this->flashMessage('Nesprávné přihlašovací údaje', 'danger');
+        };
 
-		return $form;
-	}
+        return $form;
+    }
 }

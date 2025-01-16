@@ -8,22 +8,22 @@ use App\Model\HistoryLog;
 
 class CronPresenter extends BasePresenter
 {
-	/** @var HistoryLog @inject */
-	public $historyLog;
+    /** @var HistoryLog @inject */
+    public $historyLog;
 
-	public function __construct(private string $hash = '')
-	{
-		\Tracy\Debugger::$showBar = false;
-	}
+    public function __construct(private string $hash = '')
+    {
+        \Tracy\Debugger::$showBar = false;
+    }
 
-	public function actionDefault($hash): void
-	{
-		if ($this->hash == $hash) {
-			echo "OK!";
-		} else {
-			echo 'ERROR: Wrong hash.';
-		}
+    public function actionDefault($hash): void
+    {
+        if ($this->hash == $hash) {
+            echo 'OK!';
+        } else {
+            echo 'ERROR: Wrong hash.';
+        }
 
-		$this->terminate();
-	}
+        $this->terminate();
+    }
 }

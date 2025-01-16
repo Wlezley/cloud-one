@@ -1,69 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="cs">
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="Content-Type"	content="text/html; charset=UTF-8" />
-	<meta name="viewport"			content="width=device-width" />
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width" />
 
 {block headoverride}
-	<meta name="description"		content="CLOUD ONE" />
-	<meta name="author"				content="Wlezley Lishack" />
-	<meta name="keywords"			content="CLOUD ONE" />
-	<meta name="rating"				content="All" />
-	<meta name="robots"				content="noindex,nofollow" />
-	<meta name="googlebot"			content="noindex,nofollow" />
-	<meta name="copyright"			content="Wlezley Simulation Software, s.r.o." />
-	<meta name="designer"			content="Wlezley Lishack" />
-	<meta name="programmer"			content="Wlezley Lishack" />
-	<meta property="og:title"		content="{ifset title}{include title|striptags} | {/ifset}CLOUD ONE" />
-	<meta property="og:type"		content="website" />
-	<meta property="og:url"			content="{$baseUrl}/" />
-	<meta property="og:image"		content="{$baseUrl}/img/logo.png" />
-	<meta property="og:description"	content="CLOUD ONE" />
-	<meta property="og:determiner"	content="CLOUD ONE" />
-	<meta property="og:locale"		content="cs_CZ" />
-	<meta property="og:site_name"	content="CLOUD ONE" />
-	<title>{ifset title}{include title|striptags} | {/ifset}CLOUD ONE</title>
+    <meta name="description" content="CLOUD ONE" />
+    <meta name="author" content="Wlezley Lishack" />
+    <meta name="keywords" content="CLOUD ONE" />
+    <meta name="rating" content="All" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="googlebot" content="noindex,nofollow" />
+    <meta name="copyright" content="Wlezley Lishack" />
+    <meta name="designer" content="Wlezley Lishack" />
+    <meta name="programmer" content="Wlezley Lishack" />
 
-	<link rel="stylesheet" type="text/css" href="{$baseUrl}/libs/bootstrap/dist/css/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="{$baseUrl}/libs/font-awesome/css/all.min.css">
-	<link rel="stylesheet" type="text/css" href="{$baseUrl}/css/style.css">
+    <meta property="og:title" content="{ifset title}{include title|striptags} | {/ifset}CLOUD ONE" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{$baseUrl}/" />
+    <meta property="og:image" content="{$baseUrl}/img/logo.png" />
+    <meta property="og:description" content="CLOUD ONE" />
+    <meta property="og:determiner" content="CLOUD ONE" />
+    <meta property="og:locale" content="cs_CZ" />
+    <meta property="og:site_name" content="CLOUD ONE" />
+    <title>{ifset title}{include title|striptags} | {/ifset}CLOUD ONE</title>
 
-	<link href="https://fonts.googleapis.com/css?family=Oswald:400,300,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
-	<link rel="shortcut icon" href="{$baseUrl}/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="{$baseUrl}/libs/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{$baseUrl}/libs/font-awesome/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{$baseUrl}/css/style.css">
+
+    <link href="https://fonts.googleapis.com/css?family=Oswald:400,300,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <link rel="shortcut icon" href="{$baseUrl}/favicon.ico">
 {/block}
 
-	{* {block javascript}
-	{/block} *}
+    {* {block javascript}
+    {/block} *}
 
-	{block head}
-	{/block}
+    {block head}
+    {/block}
 </head>
 
 <body>
 {if $user->isLoggedIn() && $presenter->name !='Tisk' && $presenter->name !='Cron' && $presenter->name !='Upload'}
-	<div class="container-fluid" id="pageWrap">
-		<div class="row">
-			<div class="col-lg-2 col-md-3 col-sm-4 d-print-none">
-				{include './layout/sidebar.latte'}
-			</div>
-			<div class="col-lg-10 col-md-9 col-sm-8 contentWrap">
-				<div class="content">
-					{*include './layout/alerts.latte'*}
-					{include content}
-				</div>
-			</div>
-			{include './layout/footer.latte'}
-		</div>
-	</div>
+    <div class="container-fluid" id="pageWrap">
+        <div class="row">
+            <div class="col-lg-2 col-md-3 col-sm-4 d-print-none">
+                {include './layout/sidebar.latte'}
+            </div>
+            <div class="col-lg-10 col-md-9 col-sm-8 contentWrap">
+                <div class="content">
+                    {*include './layout/alerts.latte'*}
+                    {include content}
+                </div>
+            </div>
+            {include './layout/footer.latte'}
+        </div>
+    </div>
 {else}
-	{include content}
+    {include content}
 {/if}
 
-	{block scripts}
-	<script src="https://nette.github.io/resources/js/3/netteForms.min.js"></script>
-	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-	<script src="{$baseUrl}/libs/bootstrap/dist/js/bootstrap.min.js"></script>
-	{/block}
+    {block scripts}
+    <script src="https://nette.github.io/resources/js/3/netteForms.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="{$baseUrl}/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+    {/block}
 </body>
 </html>

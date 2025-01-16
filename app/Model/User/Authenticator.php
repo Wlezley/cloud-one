@@ -12,43 +12,42 @@ use Nette\Security\Passwords;
 use Nette\Security\Identity;
 // use Nette\Security\AuthenticationException;
 
-
 class Authenticator implements Nette\Security\IAuthenticator
 {
-	/** @var Nette\Database\Explorer */
-	protected $db;
+    /** @var Nette\Database\Explorer */
+    protected $db;
 
-	/** @var Passwords */
-	private $passwords;
+    /** @var Passwords */
+    private $passwords;
 
-	public function __construct(Explorer $db, Passwords $passwords)
-	{
-		$this->db = $db;
-		$this->passwords = $passwords;
-	}
+    public function __construct(Explorer $db, Passwords $passwords)
+    {
+        $this->db = $db;
+        $this->passwords = $passwords;
+    }
 
-	public function authenticate(array $credentials): Nette\Security\IIdentity
-	{
-		list($username, $password) = $credentials;
+    public function authenticate(array $credentials): Nette\Security\IIdentity
+    {
+        list($username, $password) = $credentials;
 
-		$row = $this->db->table('user_accounts')->where('username', $username)->fetch();
+        $row = $this->db->table('user_accounts')->where('username', $username)->fetch();
 
-		if (!($row && $this->passwords->verify($password, $row->password))) {
-			throw new Nette\Security\AuthenticationException('Nesprávné přihlašovací údaje');
-		}
+        if (!($row && $this->passwords->verify($password, $row->password))) {
+            throw new Nette\Security\AuthenticationException('Nesprávné přihlašovací údaje');
+        }
 
-		$user = $row->toArray();
-		unset($user['password']);
+        $user = $row->toArray();
+        unset($user['password']);
 
-		return new Nette\Security\Identity($user['id'], $user['role'], $user);
-	}
+        return new Nette\Security\Identity($user['id'], $user['role'], $user);
+    }
 
-	public function addUser(string $username, string $password, string $role = 'user'): void
-	{
-		$this->db->table('user_accounts')->insert([
-			'username' => $username,
-			'password' => $this->passwords->hash($password),
-			'role'	   => $role
-		]);
-	}
+    public function addUser(string $username, string $password, string $role = 'user'): void
+    {
+        $this->db->table('user_accounts')->insert([
+            'username' => $username,
+            'password' => $this->passwords->hash($password),
+            'role' => $role
+        ]);
+    }
 }

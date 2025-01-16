@@ -6,7 +6,6 @@ namespace App\Presenters;
 
 use Nette;
 
-
 final class Error4xxPresenter extends Nette\Application\UI\Presenter
 {
 	public function startup(): void
@@ -16,7 +15,6 @@ final class Error4xxPresenter extends Nette\Application\UI\Presenter
 			$this->error();
 		}
 	}
-
 
 	public function renderDefault(Nette\Application\BadRequestException $exception): void
 	{

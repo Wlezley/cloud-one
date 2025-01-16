@@ -3,10 +3,11 @@
 namespace App\Presenters;
 
 use Nette;
+use Nette\Database\Explorer;
 
 class BasePresenter extends Nette\Application\UI\Presenter
 {
-	/** @var Nette\Database\Explorer @inject */
+	/** @var Explorer @inject */
 	public $db;
 
 	public function __construct()

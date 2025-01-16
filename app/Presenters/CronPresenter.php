@@ -4,35 +4,26 @@ declare(strict_types=1);
 
 namespace App\Presenters;
 
-use Nette;
-use App\Model;
-use Tracy\Debugger;
-
+use App\Model\HistoryLog;
 
 class CronPresenter extends BasePresenter
 {
-	/** @var Model\HistoryLog\HistoryLog */
-	protected $historyLog;
+	/** @var HistoryLog @inject */
+	public $historyLog;
 
-	/** @var string */
-	private string $hash;
-
-	public function __construct(string $hash = "")
+	public function __construct(private string $hash = '')
 	{
-		// Disable Tracy Debug Bar
-		Debugger::$showBar = false;
-
-		//$this->hash = $hash;
-		$this->historyLog = new Model\HistoryLog($this->db);
-		$this->terminate();
+		\Tracy\Debugger::$showBar = false;
 	}
 
-	public function actionDefault($hash)
+	public function actionDefault($hash): void
 	{
-		if ($this->hash == $hash)
-		{
+		if ($this->hash == $hash) {
 			echo "OK!";
+		} else {
+			echo 'ERROR: Wrong hash.';
 		}
+
 		$this->terminate();
 	}
 }

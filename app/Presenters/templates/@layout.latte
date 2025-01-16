@@ -1,16 +1,11 @@
-{**
- * @param string	$baseUrl	web base URL
- * @param string	$title		page title
- * @param array		$flashes	flash messages
- *}
 <!DOCTYPE html>
 <html>
 <head>
-{* META *}
 	<meta charset="utf-8">
 	<meta http-equiv="Content-Type"	content="text/html; charset=UTF-8" />
 	<meta name="viewport"			content="width=device-width" />
-	{block headoverride}
+
+{block headoverride}
 	<meta name="description"		content="CLOUD ONE" />
 	<meta name="author"				content="Wlezley Lishack" />
 	<meta name="keywords"			content="CLOUD ONE" />
@@ -28,41 +23,33 @@
 	<meta property="og:determiner"	content="CLOUD ONE" />
 	<meta property="og:locale"		content="cs_CZ" />
 	<meta property="og:site_name"	content="CLOUD ONE" />
-{* TITLE *}
 	<title>{ifset title}{include title|striptags} | {/ifset}CLOUD ONE</title>
-	{*<title>{ifset title}{include title|stripHtml} | {/ifset}CLOUD ONE</title>*}
-{* CSS *}
-	{*<!-- link rel="stylesheet" type="text/css" href="{$baseUrl}/libs/hover/css/hover-min.css" -->
-	<!-- link rel="stylesheet" type="text/css" href="{$baseUrl}/libs/wow/css/libs/animate.css" -->
-	<!-- link rel="stylesheet" type="text/css" href="{$baseUrl}/libs/sidebar/css/simple-sidebar.css" -->*}
+
 	<link rel="stylesheet" type="text/css" href="{$baseUrl}/libs/bootstrap/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="{$baseUrl}/libs/font-awesome/css/all.min.css">
-	{*<!-- link rel="stylesheet" type="text/css" href="{$baseUrl}/libs/font-awesome/css/regular.min.css" -->*}
 	<link rel="stylesheet" type="text/css" href="{$baseUrl}/css/style.css">
-{* FONTS *}
+
 	<link href="https://fonts.googleapis.com/css?family=Oswald:400,300,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
 	<link rel="shortcut icon" href="{$baseUrl}/favicon.ico">
-{* JAVA SCRIPT *}
-	{*block javascript}
-	{/block*}
-{* HEAD BLOCK *}
-	{/block}
+{/block}
+
+	{* {block javascript}
+	{/block} *}
+
 	{block head}
 	{/block}
 </head>
 
 <body>
-	{*block styles}
-	{/block*}
 {if $user->isLoggedIn() && $presenter->name !='Tisk' && $presenter->name !='Cron' && $presenter->name !='Upload'}
 	<div class="container-fluid" id="pageWrap">
 		<div class="row">
 			<div class="col-lg-2 col-md-3 col-sm-4 d-print-none">
-				{include 'layout/sidebar.latte'}
+				{include './layout/sidebar.latte'}
 			</div>
 			<div class="col-lg-10 col-md-9 col-sm-8 contentWrap">
 				<div class="content">
-					{*include 'layout/alerts.latte'*}
+					{*include './layout/alerts.latte'*}
 					{include content}
 				</div>
 			</div>
@@ -74,7 +61,6 @@
 {/if}
 
 	{block scripts}
-	<!--script src="https://nette.github.io/resources/js/netteForms.min.js"></script-->
 	<script src="https://nette.github.io/resources/js/3/netteForms.min.js"></script>
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 	<script src="{$baseUrl}/libs/bootstrap/dist/js/bootstrap.min.js"></script>

@@ -1,32 +1,17 @@
 <?php
 
-namespace App\Presenters;
+declare(strict_types=1);
 
-use Nette;
-use App\Forms;
+namespace App\Presenters;
 
 class SecuredPresenter extends BasePresenter
 {
-	/* * @var Forms\ISearchFormFactory @inject * /
-	public $searchForm;*/
-
-	public function startup()
+	public function startup(): void
 	{
 		parent::startup();
 
-		if (!$this->user->isLoggedIn() /*|| !isset($this->getContext()->parameters['prava'])*/ )
+		if (!$this->user->isLoggedIn()) {
 			$this->redirect('Sign:in');
-
-		//$this->template->permissions = TRUE;
-		/*isset($this->user->getRoles()[0])
-		? $this->getContext()->parameters['prava'][$this->user->getRoles()[0]]
-		: $this->getContext()->parameters['prava']['admin'];*/
+		}
 	}
-
-	/*protected function createComponentSearchForm()
-	{
-		$form = $this->searchForm->create();
-
-		return $form;
-	}*/
 }

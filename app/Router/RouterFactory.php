@@ -7,7 +7,6 @@ namespace App\Router;
 use Nette;
 use Nette\Application\Routers\RouteList;
 
-
 final class RouterFactory
 {
 	use Nette\StaticClass;
@@ -23,7 +22,7 @@ final class RouterFactory
 		// CRON
 		$router->addRoute('cron/[<hash>/]', 'Cron:default');
 
-		// FILES (Soubory)
+		// FILES
 		//$router->addRoute('files/', 'Files:default');
 		$router->addRoute('files/[<path .+>/]', 'Files:directory');
 
@@ -39,11 +38,11 @@ final class RouterFactory
 		// UPLOAD
 		$router->addRoute('upload/[<hash>/]', 'Upload:default');
 
-		// PERMISSIONS (Oprávnění)
+		// PERMISSIONS
 		$router->addRoute('permissions/', 'Permissions:default');
 		//$router->addRoute('permissions[/<userid>]', 'Permissions:user');
 
-		// SETTINGS (Nastavení)
+		// SETTINGS
 		$router->addRoute('settings/', 'Settings:default');
 		//$router->addRoute('settings[/<userid>]', 'Settings:user');
 

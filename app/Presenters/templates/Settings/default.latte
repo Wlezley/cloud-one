@@ -1,9 +1,5 @@
 {block title}Nastavení cloudu{/block}
 
-{*block head}
-{include parent}
-{/block*}
-
 {block content}
 	<div id="banner">
 		<h1>{include title|striptags}</h1>
@@ -14,13 +10,6 @@
 	<div id="content">
 		{include '../layout/alerts.latte'}
 	</div>
-
-	{* DEBUG *}
-	{* <div class="row">
-		<div class="col-lg-12">
-			<p>{$debug}</p>
-		</div>
-	</div> *}
 
 	{foreach $testing as $key => $test}
 		<h2>Folder ID: {$key}</h2>
@@ -38,30 +27,4 @@
 			</p>
 		</div>
 	{/foreach}
-
-
-	{*<div class="row col-lg-12">
-		<table class="table">
-			<tr>
-				<th>#</th>
-				<th>Login</th>
-				<th>Jméno</th>
-				<th>E-Mail</th>
-				<th>Telefon</th>
-				<th>Role</th>
-				<th>AKCE</th>
-			</tr>
-		{foreach $seznamUzivatelu as $uzivatel}
-			<tr>
-				<td>{$uzivatel['id']}</td>
-				<td>{$uzivatel['username']}</td>
-				<td>{$uzivatel['fullname']}</td>
-				<td>{$uzivatel['email']}</td>
-				<td>{$uzivatel['telefon']|substr:0:3}&nbsp;{$uzivatel['telefon']|substr:3:3}&nbsp;{$uzivatel['telefon']|substr:6:3}</td>
-				<td>{$uzivatel['role']}</td>
-				<td>TODO...</td>
-			</tr>
-		{/foreach}
-		</table>
-	</div>*}
 {/block}

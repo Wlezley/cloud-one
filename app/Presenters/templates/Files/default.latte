@@ -51,7 +51,7 @@
 					</td>
 					<td style="text-align: left;"	class="clickable-row" data-href="{$downloadLink}">{$file['fileName']}</td>
 					<td style="text-align: right;"	class="clickable-row" data-href="{$downloadLink}">{$file['fileSize']|bytes:0}</td>
-					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}">{$file['date_upload']|date:'%d.%m.%Y %H:%M'}</td>
+					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}">{$file['date_upload']|date:'d.m.Y H:i'}</td>
 					<td style="text-align: center;"	class="clickable-row" data-href="{$downloadLink}">{$owner['fullname']}</td>
 					<td style="text-align: center; border-left: 1px solid #dee2e6;">
 						<a href="{link Files:delete, storageID => $file['storageID']}" title="Smazat soubor"

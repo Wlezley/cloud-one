@@ -5,111 +5,70 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Nette;
-use App\Model;
-use Nette\Utils\Json;
-use Nette\Utils\ArrayHash;
 use Nette\Database\Explorer;
-use Tracy\Debugger;
-use Carbon\Carbon;
 
 
 class HistoryLog
 {
-	/** @var Nette\Database\Explorer */
-	protected $db;
+	public const TABLE_NAME = 'log_history';
+
+	/** @var Nette\Database\Explorer @inject */
+	public $db;
 
 	/** @var int */
 	protected $userID;
 
-	public function __construct(Explorer $db)
+	public function __construct()
 	{
-		$this->db = $db;
 	}
 
-	/*
-	LEVEL:				ACTION:				TYPE:
-		info				new					cron
-		warning				add					system
-		error				edit				contract
-		debug				update				product_item
-		n/a <DEFAULT>		delete				file
-							remove				webcam
-							send				signature
-							print				warehouse
-							upload				status
-							unk <DEFAULT>		unk <DEFAULT>
-	*/
-
-	// user, level, action, type, subject, description, data
-	public function writeLogIssueRAW($user = 0, $level = 'n/a', $action = 'unk', $type = 'unk', $subject = NULL, $description = "", $data = NULL)
+	public function writeLogIssueRAW($user = 0, $level = 'n/a', $action = 'unk', $type = 'unk', $subject = NULL, $description = "", $data = NULL): void
 	{
-		return $this->db->table('log_history')->insert([
-			//'id'			=> //AUTOINCREMENT
-			//'date'		=> Carbon::now()->format('Y-m-d H:i:s'), // AUTO: This field is handled by DB automatically
+		$this->db->table(self::TABLE_NAME)->insert([
 			'user'			=> $user,			// 0 = SYSTEM
 		    'level'			=> $level,			// Options: info, warning, error, debug, n/a
 			'action'		=> $action,			// Options: new, add, edit, update, delete, remove, send, print, upload, unk
 			'type'			=> $type,			// Options: cron, system, contract, product_item, file, webcam, signature, warehouse, status, unk
 			'subject'		=> $subject,		// ID of the item to which the listing applies (For example - productid, contractid, etc...), default is NULL
 			'description'	=> $description,	// VARCHAR (255)
-			'data'			=> $data,			// TODO: Array to JSON conversion!!!
+			'data'			=> $data,			// TODO: Array to JSON
 		]);
 	}
 
-	public function readLogIssueRAW($id)
+	public function readLogIssueRAW(int $id): array
 	{
+		return $this->db->table(self::TABLE_NAME)->get($id)->toArray();
+	}
+
+	public function getLogList($page = 1, $type = NULL, $action = NULL, $level = NULL): void
+	{
+		// TODO: Select from DB
 		return;
 	}
-
-	public function getLogList($page = 1, $type = NULL, $action = NULL, $level = NULL)
-	{
-		return;
-	}
-
-	// COMMON ---->>
-	public function log_Info($description, $data)
-	{
-		return $this->writeLogIssueRAW(0, 'info', 'unk', 'system', NULL, $description, $data);
-	}
-	public function log_Warning($description, $data)
-	{
-		return $this->writeLogIssueRAW(0, 'warning', 'unk', 'system', NULL, $description, $data);
-	}
-	public function log_Error($description, $data)
-	{
-		return $this->writeLogIssueRAW(0, 'error', 'unk', 'system', NULL, $description, $data);
-	}
-	public function log_Debug($description, $data)
-	{
-		return $this->writeLogIssueRAW(0, 'debug', 'unk', 'system', NULL, $description, $data);
-	}
-	// <<---- COMMON
-
 
 	// SYSTEM ---->>
-	public function log_UpdateCron($fceName, $subject = NULL, $data = NULL)
+	public function log_Info($description, $data): void
 	{
-		return $this->writeLogIssueRAW(0, 'info', 'update', 'cron', $subject, $fceName, $data);
+		$this->writeLogIssueRAW(0, 'info', 'unk', 'system', NULL, $description, $data);
+	}
+	public function log_Warning($description, $data): void
+	{
+		$this->writeLogIssueRAW(0, 'warning', 'unk', 'system', NULL, $description, $data);
+	}
+	public function log_Error($description, $data): void
+	{
+		$this->writeLogIssueRAW(0, 'error', 'unk', 'system', NULL, $description, $data);
+	}
+	public function log_Debug($description, $data): void
+	{
+		$this->writeLogIssueRAW(0, 'debug', 'unk', 'system', NULL, $description, $data);
 	}
 	// <<---- SYSTEM
 
-
-	// ZAKAZKY ---->>
-	public function log_UpdateContractStatus($user, $zakazka, $status, $affectedRows = 0)
+	// CRON ---->>
+	public function log_UpdateCron($fceName, $subject = NULL, $data = NULL): void
 	{
-		return $this->writeLogIssueRAW($user, 'info', 'update', 'contract', $zakazka, 'ZAKAZKY/setZakazkaStatus('.$zakazka.', '.$status.')', 'Rows: '.$affectedRows);
+		$this->writeLogIssueRAW(0, 'info', 'update', 'cron', $subject, $fceName, $data);
 	}
-
-	public function log_UpdateContractItemCount($user, $fceName, $zakazka, $polozka, $affectedRows = 0)
-	{
-		return $this->writeLogIssueRAW($user, 'info', 'update', 'product_item', $zakazka, 'ZAKAZKY/'.$fceName.'('.$zakazka.', '.$polozka.')', 'Rows: '.$affectedRows);
-	}
-
-	/*
-	addZakazkaPolozkaByPid
-	subZakazkaPolozkaByPid
-	delZakazkaPolozkaByPid
-	*/
-	// <<---- ZAKAZKY
-
+	// <<---- CRON
 }

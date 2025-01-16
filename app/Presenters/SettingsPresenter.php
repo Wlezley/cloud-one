@@ -4,38 +4,25 @@ declare(strict_types=1);
 
 namespace App\Presenters;
 
-use Nette;
-use App\Model;
-use App\Model\Storage;
 use App\Model\StorageTree;
-use Nette\Utils\Json;
-use Nette\Utils\ArrayHash;
-use Tracy\Debugger;
-
 
 final class SettingsPresenter extends SecuredPresenter
 {
 	/** @var StorageTree @inject */
 	public $storageTree;
 
-	public function __construct()
-	{
-		// $this->storageTree = $storageTree;
-	}
-
-	public function startup()
+	public function startup(): void
 	{
 		parent::startup();
 	}
 
-	public function renderDefault()
+	public function renderDefault(): void
 	{
-		// DEBUG ?
 		$this->flashMessage('Nastavení cloudu je v rekonstrukci.', 'warning');
 
 		// DEBUG ONLY ---->>
-		//$this->storageTree->load(0);
-		//$this->template->debug = $this->storageTree->getPath();
+		// $this->storageTree->load(0);
+		// $this->template->debug = $this->storageTree->getPath();
 
 		$this->storageTree->setOwnerID(1);
 		// bdump($this->storageTree->getTreeList(), "GET TREE LIST");
@@ -51,8 +38,7 @@ final class SettingsPresenter extends SecuredPresenter
 		}
 
 		bdump($this->storageTree->getOwnerList(), "GET OWNER LIST");
-		//$this->template->ownerList = $this->storage->getOwnerList();
-
+		// $this->template->ownerList = $this->storage->getOwnerList();
 
 
 
@@ -62,13 +48,11 @@ final class SettingsPresenter extends SecuredPresenter
 		$this->template->pocetPolozek = 0;
 
 		$result = $this->db->query('SELECT * FROM user_accounts');
-		if($result->getRowCount() >= 1)
-		{
+		if($result->getRowCount() >= 1) {
 			$this->template->seznamUzivatelu = $result->fetchAll();
 		}
 
-		if(!isset($this->template->seznamUzivatelu) || $this->template->seznamUzivatelu == NULL)
-		{
+		if(!isset($this->template->seznamUzivatelu) || $this->template->seznamUzivatelu == NULL) {
 			$this->flashMessage('Seznam uživatelů je prázdný.', 'info');
 			return;
 		}

@@ -10,7 +10,7 @@ use Nette\Database\Explorer;
 use Nette\Security\IAuthenticator;
 use Nette\Security\Passwords;
 use Nette\Security\Identity;
-//use Nette\Security\AuthenticationException;
+// use Nette\Security\AuthenticationException;
 
 
 class Authenticator implements Nette\Security\IAuthenticator
@@ -27,12 +27,7 @@ class Authenticator implements Nette\Security\IAuthenticator
 		$this->passwords = $passwords;
 	}
 
-	/**
-	 * @param array $credentials
-	 * @return Identity
-	 * @throws Nette\Security\AuthenticationException
-	 */
-	public function authenticate(array $credentials) : Nette\Security\IIdentity
+	public function authenticate(array $credentials): Nette\Security\IIdentity
 	{
 		list($username, $password) = $credentials;
 
@@ -48,12 +43,7 @@ class Authenticator implements Nette\Security\IAuthenticator
 		return new Nette\Security\Identity($user['id'], $user['role'], $user);
 	}
 
-	/**
-	 * @param $username
-	 * @param $password
-	 * @param string $role
-	 */
-	public function addUser($username, $password, $role = 'user')
+	public function addUser(string $username, string $password, string $role = 'user'): void
 	{
 		$this->db->table('user_accounts')->insert([
 			'username' => $username,

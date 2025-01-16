@@ -4,43 +4,29 @@ declare(strict_types=1);
 
 namespace App\Presenters;
 
-use Nette;
-use App\Model;
-use Nette\Utils\Json;
-use Nette\Utils\ArrayHash;
-use Tracy\Debugger;
-
-
 final class PermissionsPresenter extends SecuredPresenter
 {
-	public function __construct()
-	{
-	}
-
-	public function startup()
+	public function startup(): void
 	{
 		parent::startup();
 	}
 
-	public function renderDefault()
+	public function renderDefault(): void
 	{
-		// DEBUG ?
 		$this->flashMessage('Uživatelská oprávnění jsou v rekonstrukci.', 'warning');
 
 		$this->template->seznamUzivatelu = NULL;
 		$this->template->pocetPolozek = 0;
 
 		$result = $this->db->query('SELECT * FROM user_accounts');
-		if($result->getRowCount() >= 1)
-		{
+		if($result->getRowCount() >= 1) {
 			$this->template->seznamUzivatelu = $result->fetchAll();
 		}
 
-		if(!isset($this->template->seznamUzivatelu) || $this->template->seznamUzivatelu == NULL)
-		{
+		if(!isset($this->template->seznamUzivatelu) || $this->template->seznamUzivatelu == NULL) {
 			$this->flashMessage('Seznam uživatelů je prázdný.', 'info');
-			return;
+		} else {
+			$this->template->pocetPolozek = count($this->template->seznamUzivatelu);
 		}
-		$this->template->pocetPolozek = count($this->template->seznamUzivatelu);
 	}
 }

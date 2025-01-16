@@ -5,19 +5,14 @@ namespace App\Forms;
 use Nette;
 use Nette\Security\User;
 use Nette\Application\UI\Form;
-use Tracy\Debugger;
 
-class SignInFormFactory /*extends Nette\Object*/
+class SignInFormFactory
 {
-	/** @var User */
-	protected $user;
-
-	public function __construct(User $user)
+	public function __construct(protected User $user)
 	{
-		$this->user = $user;
 	}
 
-	public function create()
+	public function create(): Form
 	{
 		$form = new Form();
 
@@ -36,12 +31,12 @@ class SignInFormFactory /*extends Nette\Object*/
 		return $form;
 	}
 
-	public function process(Form $form, $values)
+	public function process(Form $form, $values): void
 	{
 		try {
 			$this->user->login($values->username, $values->password);
-			//$this->user->setExpiration('+6 hours', true);
-			//$this->user->setExpiration('+6 hours');
+			// $this->user->setExpiration('+6 hours', true);
+			// $this->user->setExpiration('+6 hours');
 			$this->user->setExpiration(null);
 		} catch(Nette\Security\AuthenticationException $e) {
 			$form->addError($e->getMessage());

@@ -5,35 +5,28 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Nette;
-use Carbon\Carbon;
 
 class StorageFiles extends Storage
 {
+	public const TABLE_NAME = 'storage_files';
+
 	/** @var Nette\Database\Explorer @inject */
 	public $db;
 
 	public int $tree_id;
 	public array $file_list;
-
 	public bool $is_loaded;
-
 
 	public function __construct(Nette\Database\Explorer $db)
 	{
 		$this->db = $db;
-		//parent::__construct();
-
 		$this->is_loaded = false;
-
-		// if ($tree_id) {
-		// 	$this->load($tree_id);
-		// }
 	}
 
-	public function load(int $id = 0)
+	// TODO...
+	public function load(int $id = 0): void
 	{
 		$this->is_loaded = true;
-		return;
 	}
 }
 

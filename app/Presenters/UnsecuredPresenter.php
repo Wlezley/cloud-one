@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Presenters;
+declare(strict_types=1);
 
-use Nette;
+namespace App\Presenters;
 
 class UnsecuredPresenter extends BasePresenter
 {
-	public function startup()
+	public function startup(): void
 	{
 		parent::startup();
 
-		if ($this->user->isLoggedIn())
+		if ($this->user->isLoggedIn()) {
 			$this->redirect('Homepage:');
+		}
 	}
 }

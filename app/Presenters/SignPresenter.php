@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Presenters;
 
+use App\Forms\SignInFormFactory;
 use Nette;
-use App\Forms;
 
 class SignPresenter extends UnsecuredPresenter
 {
-	/** @var Forms\SignInFormFactory @inject */
+	/** @var SignInFormFactory @inject */
 	public $signInForm;
 
-	public function renderDefault()
+	public function renderDefault(): void
 	{
 		$this->redrawControl();
 	}
 
-	protected function createComponentSignInForm()
+	protected function createComponentSignInForm(): Nette\Application\UI\Form
 	{
 		$form = $this->signInForm->create();
 

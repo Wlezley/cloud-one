@@ -1,15 +1,11 @@
 {block title}Homepage{/block}
 
-{*block head}
-{include parent}
-{/block*}
-
 {block content}
-	{*<form role="search" class="bd-search d-flex align-items-center">
+	{* <form role="search" class="bd-search d-flex align-items-center">
 		<input type="search" class="form-control" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off" data-docs-version="{{ site.docs_version }}">
 		<button class="btn btn-link bd-search-docs-toggle d-md-none p-0 ml-3" type="button" data-toggle="collapse" data-target="#bd-docs-nav" aria-controls="bd-docs-nav" aria-expanded="false" aria-label="Toggle docs navigation">
 		Vyhledat</button>
-	</form>*}
+	</form> *}
 
 	<div id="banner">
 		<h1>{include title|striptags}</h1>
@@ -18,9 +14,4 @@
 	<div id="content">
 		{include '../layout/alerts.latte'}
 	</div>
-
-	<br />
-	{*<pre>{$debug}</pre>*}
-	{*<pre>{$debug2}</pre>*}
-	<!--p>Hlavní stránka</p-->
 {/block}

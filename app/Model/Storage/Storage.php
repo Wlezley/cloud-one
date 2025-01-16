@@ -5,15 +5,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Nette;
-use App\Model;
-use Nette\Utils\Json;
 use Nette\Utils\Random;
-use Nette\Utils\Strings;
-use Nette\Utils\ArrayHash;
-use Nette\Database\Explorer;
-use Tracy\Debugger;
-
-use Carbon\Carbon;
 
 class Storage
 {
@@ -27,15 +19,7 @@ class Storage
 	{
 	}
 
-	/** Vygeneruje nahodny alfa-numericky kod
-	 * 
-	 * @param	int				$size
-	 * @param	string|null		$table
-	 * @param	string|null		$field
-	 *
-	 * @return	string
-	 */
-	public function getRandomCode($size, $table = null, $field = null)
+	public function getRandomCode(int $size, ?string $table = null, ?string $field = null): string
 	{
 		$charlist = '0-9a-z';
 
@@ -59,7 +43,7 @@ class Storage
 		return ($counter == $limit) ? str_repeat('f', $size) : $randomCode;
 	}
 
-	public function getOwnerList()
+	public function getOwnerList(): array
 	{
 		$result = $this->db->query('SELECT id,username,fullname,role FROM user_accounts ORDER BY id ASC');
 

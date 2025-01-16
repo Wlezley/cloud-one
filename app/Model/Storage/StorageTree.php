@@ -9,6 +9,8 @@ use Carbon\Carbon;
 
 class StorageTree extends Storage
 {
+	public const TABLE_NAME = 'storage_tree';
+
 	/** @var Nette\Database\Explorer @inject */
 	public $db;
 
@@ -21,27 +23,15 @@ class StorageTree extends Storage
 	public Carbon $date_download;
 	public Carbon $date_delete;
 	public Carbon $date_modify;
-
 	public bool $is_loaded;
-
 
 	public function __construct(Nette\Database\Explorer $db)
 	{
 		$this->db = $db;
-		//parent::__construct();
-
 		$this->is_loaded = false;
-
-		// if ($tree_id) {
-		// 	$this->load($tree_id);
-		// }
-
 		$this->reset();
 	}
 
-	/** RESET folder data
-	 * @return StorageTree
-	 */
 	public function reset(): StorageTree
 	{
 		$this->tree_id			= 0;
@@ -58,11 +48,6 @@ class StorageTree extends Storage
 		return $this;
 	}
 
-	/** Load folder data
-	 * @param int		$tree_id	ID of folder
-	 * 
-	 * @return StorageTree
-	 */
 	public function load(int $tree_id = 0): StorageTree
 	{
 		if ($tree_id == 0) {
@@ -73,7 +58,7 @@ class StorageTree extends Storage
 			}
 		}
 
-		$row = $this->db->fetch("SELECT * FROM storage_tree WHERE tree_id = ?", $tree_id);
+		$row = $this->db->fetch("SELECT * FROM " . self::TABLE_NAME . " WHERE tree_id = ?", $tree_id);
 
 		if ($row) {
 			$this->tree_id			= $row["tree_id"];
@@ -91,9 +76,6 @@ class StorageTree extends Storage
 		return $this;
 	}
 
-	/** Save folder data
-	 * @return bool
-	 */
 	public function save(): bool
 	{
 		$data = [
@@ -108,23 +90,14 @@ class StorageTree extends Storage
 			"date_modify"	=> $this->date_modify->format("Y-m-d H:i:s.u"),		// TIMESTAMP, ON UPDATE current_timestamp()
 		];
 
-		//bdump($data, "StorageTree::save() DATA");
+		// bdump($data, "StorageTree::save() DATA");
 
-		$result = $this->db->query("UPDATE storage_tree SET", $data, "WHERE tree_id = ?", $this->tree_id);
+		$result = $this->db->query("UPDATE " . self::TABLE_NAME . " SET", $data, "WHERE tree_id = ?", $this->tree_id);
 
 		return ($result->getRowCount() == 1);
 	}
 
-	/** Create new folder
-	 * @todo VALIDATE INPUT DATA !!!
-	 * 
-	 * @param string	$name		New folder name
-	 * @param int		$parent_id	ID of parrent folder (0 == ROOT folder)
-	 * @param int		$owner_id	ID of user who own this folder
-	 * 
-	 * @return StorageTree			Returns tree_id of the new folder or null when error is occoured.
-	 */
-	public function create(string $name, int $parent_id = 0, int $owner_id = 0)
+	public function create(string $name, int $parent_id = 0, int $owner_id = 0): StorageTree
 	{
 		$data = [
 			"parent_id"		=> $parent_id,								// INT(11)
@@ -133,9 +106,9 @@ class StorageTree extends Storage
 			"name_url"		=> \Nette\Utils\Strings::Webalize($name),	// VARCHAR(255)
 		];
 
-		//bdump($data, "StorageTree::create(ARGS)");
+		// bdump($data, "StorageTree::create(ARGS)");
 
-		$result = $this->db->query("INSERT INTO storage_tree ?", $data);
+		$result = $this->db->query("INSERT INTO " . self::TABLE_NAME . " ?", $data);
 
 		if ($result && $this->db->getInsertId()) {
 			return $this->load((int)$this->db->getInsertId());
@@ -144,12 +117,7 @@ class StorageTree extends Storage
 		return $this;
 	}
 
-	/** Rename existing folder
-	 * @param string	$name_new	New folder name
-	 * 
-	 * @return StorageTree|null
-	 */
-	public function rename(string $name_new): mixed
+	public function rename(string $name_new): StorageTree
 	{
 		if (!$this->is_loaded || empty($name_new)) {
 			return null;
@@ -158,7 +126,9 @@ class StorageTree extends Storage
 		$this->name = $name_new;
 		$this->name_url = \Nette\Utils\Strings::Webalize($name_new);
 
-		return $this->save() ? $this : null;
+		$this->save();
+
+		return $this;
 	}
 
 	/** Delete existing folder
@@ -166,8 +136,8 @@ class StorageTree extends Storage
 	 */
 	public function delete()
 	{
-		$this->db->query("DELETE FROM storage_tree WHERE tree_id = ?", $this->tree_id);
-		$this->db->query("DELETE FROM storage_files WHERE tree_id = ?", $this->tree_id);
+		$this->db->query("DELETE FROM " . self::TABLE_NAME . " WHERE tree_id = ?", $this->tree_id);
+		$this->db->query("DELETE FROM " . StorageFiles::TABLE_NAME . " WHERE tree_id = ?", $this->tree_id);
 
 		return $this->reset();
 	}
@@ -204,6 +174,7 @@ class StorageTree extends Storage
 		if (empty($this->name_url)) {
 			return \Nette\Utils\Strings::Webalize($this->name);
 		}
+
 		return $this->name_url;
 	}
 
@@ -248,7 +219,7 @@ class StorageTree extends Storage
 
 	// #######################################################################################################
 
-	public function getPath() //: string
+	public function getPath(): string|bool // TODO: Exceptions ?
 	{
 		if (!$this->is_loaded && $this->owner_id == 0) {
 			return false;
@@ -261,7 +232,7 @@ class StorageTree extends Storage
 		$tree_id = $this->tree_id;
 
 		do {
-			$row = $this->db->fetch("SELECT parent_id, name_url FROM storage_tree WHERE tree_id = ? AND owner_id = ?", $tree_id, $this->owner_id);
+			$row = $this->db->fetch("SELECT parent_id, name_url FROM " . self::TABLE_NAME . " WHERE tree_id = ? AND owner_id = ?", $tree_id, $this->owner_id);
 
 			if (!$row || empty($row["name_url"])) {
 				return false;
@@ -275,13 +246,13 @@ class StorageTree extends Storage
 		return $path;
 	}
 
-	public function getPathByTreeId(int $tree_id) //: string // TODO: $owner_id !!!
+	public function getPathByTreeId(int $tree_id): string|bool // TODO: Exceptions ?
 	{
 		$path = "/"; // Default return
 
 		if ($tree_id != 0) {
 			do {
-				$row = $this->db->fetch("SELECT parent_id, name_url FROM storage_tree WHERE tree_id = ?", $tree_id);
+				$row = $this->db->fetch("SELECT parent_id, name_url FROM " . self::TABLE_NAME . " WHERE tree_id = ?", $tree_id);
 
 				if (!$row || empty($row["name_url"])) {
 					return false;
@@ -296,18 +267,20 @@ class StorageTree extends Storage
 		return $path;
 	}
 
-	public function getTreeIdByPath(string $path, int $owner_id) //: string // TODO: $owner_id !!!
+	public function getTreeIdByPath(string $path, int $owner_id): int
 	{
 		$pathArray = explode("/", trim($path, "/"));
-		bdump($pathArray, "URL / PATH ARRAY (StorageTree)");
+
+		bdump($pathArray, "URL / PATH ARRAY (StorageTree)"); // DEBUG
 
 		$owner_id = 1;
 		$parent_id = 0;
 
 		$treeMap = [];
 		$lastPath = "";
+
 		foreach ($pathArray as $key => $name_url) {
-			$folder = $this->db->query('SELECT * FROM storage_tree WHERE owner_id = ? AND parent_id = ? AND name_url = ? LIMIT 1', $owner_id, $parent_id, $name_url);
+			$folder = $this->db->query("SELECT * FROM " . self::TABLE_NAME . " WHERE owner_id = ? AND parent_id = ? AND name_url = ? LIMIT 1", $owner_id, $parent_id, $name_url);
 			$folderInfo = $folder->fetch();
 
 			if (!$folderInfo) {
@@ -325,9 +298,10 @@ class StorageTree extends Storage
 			$lastPath .= $folderInfo['name_url'] . "/";
 			$parent_id = $folderInfo['tree_id'];
 		}
-		bdump($treeMap, "URL / TREE MAP (StorageTree)");
 
-		return $parent_id;
+		bdump($treeMap, "URL / TREE MAP (StorageTree)"); // DEBUG
+
+		return (int)$parent_id;
 	}
 
 	/** List of sub-folders in the folder */
@@ -337,7 +311,7 @@ class StorageTree extends Storage
 			return [];
 		}
 
-		$result = $this->db->query("SELECT * FROM storage_tree WHERE parent_id = ? AND owner_id = ?", $this->tree_id, $this->owner_id);
+		$result = $this->db->query("SELECT * FROM " . self::TABLE_NAME . " WHERE parent_id = ? AND owner_id = ?", $this->tree_id, $this->owner_id);
 
 		$treeList = [];
 		foreach ($result as $key => $folder) {

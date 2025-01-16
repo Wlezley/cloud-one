@@ -68,7 +68,9 @@ final class FilesPresenter extends SecuredPresenter
             $path = $this->getHttpRequest()->getUrl()->path;
             if (substr($path, 0, strlen($base)) == $base) {
                 $path = substr($path, strlen($base));
-            } else { /* ERROR 404 ?? */ }
+            } else {
+                // ERROR 404 ?
+            }
             $tree_id = $this->storageTree->getTreeIdByPath($path, $owner_id);
 
             $timestampNow = Carbon::now()->format('Y-m-d H:i:s'); // CURRENT TIMESTAMP

@@ -39,23 +39,5 @@ final class SettingsPresenter extends SecuredPresenter
 
         bdump($this->storageTree->getOwnerList(), "GET OWNER LIST");
         // $this->template->ownerList = $this->storage->getOwnerList();
-
-
-
-
-        // puvodni kod
-        $this->template->seznamUzivatelu = NULL;
-        $this->template->pocetPolozek = 0;
-
-        $result = $this->db->query('SELECT * FROM user_accounts');
-        if($result->getRowCount() >= 1) {
-            $this->template->seznamUzivatelu = $result->fetchAll();
-        }
-
-        if(!isset($this->template->seznamUzivatelu) || $this->template->seznamUzivatelu == NULL) {
-            $this->flashMessage('Seznam uživatelů je prázdný.', 'info');
-            return;
-        }
-        $this->template->pocetPolozek = count($this->template->seznamUzivatelu);
     }
 }

@@ -15,10 +15,8 @@ namespace Oli\Form;
  */
 interface DropzoneUploaderFactory
 {
-	
 	/**
 	 * @return DropzoneUploader
 	 */
-	function create();
-	
+	function create(): DropzoneUploader;
 }

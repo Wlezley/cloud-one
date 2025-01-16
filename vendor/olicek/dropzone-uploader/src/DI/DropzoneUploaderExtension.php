@@ -22,21 +22,19 @@ class DropzoneUploaderExtension extends \Nette\DI\CompilerExtension
 		'settings' => [
 			'maxFiles' => 50,
 			'fileSizeLimit' => 5000000000, // 5000 MB
-			//'fileSizeLimit' => 1000000000, // 1000 MB
-			//'fileSizeLimit' => 100, // 10 MB
-			'ajax' => TRUE,
+			'ajax' => true,
 			'onSuccess' => 'refresh!'
 		],
 		'photo' => [
-			'width' => NULL,
-			'height' => NULL,
-			'flags' => NULL, //\Nette\Utils\Image::FIT,
-			'quality' => NULL,
-			'type' => NULL
+			'width' => null,
+			'height' => null,
+			'flags' => null, // \Nette\Utils\Image::FIT,
+			'quality' => null,
+			'type' => null
 		],
-		'isImage' => FALSE,
-		'allowType' => NULL,
-		'rewriteExistingFiles' => FALSE
+		'isImage' => false,
+		'allowType' => [],
+		'rewriteExistingFiles' => false
 	];
 
 	public function getDefaults()

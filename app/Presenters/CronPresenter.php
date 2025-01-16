@@ -44,7 +44,7 @@ class CronPresenter extends BasePresenter
 
             foreach (Finder::findFiles('*')->in($path)->exclude('.*') as $fileInfo) {
                 $fileName = $fileInfo->getFilename();
-                $fileRow = $this->db->table(StorageFiles::TABLE_NAME)->select('*')->where(['storageID' => $fileName])->fetch();
+                $fileRow = $this->db->table(StorageFiles::TABLE_NAME)->where(['storageID' => $fileName])->fetch();
 
                 if ($fileRow === null) {
                     $filePath = realpath($fileInfo->getPathname());

@@ -1,11 +1,7 @@
-app/config/local.neon
-/**/node_modules/*
-/**/bower_components/*
+/app/config/local.neon
+/node_modules/
 /**/log/*
-/**/cache/*
-/**/builds/*
 /**/temp/*
-.vscode/
 
 vendor/*
 !vendor/olicek/

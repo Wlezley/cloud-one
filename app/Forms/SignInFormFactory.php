@@ -31,7 +31,8 @@ class SignInFormFactory
         return $form;
     }
 
-    public function process(Form $form, $values): void
+    /** @param \Nette\Utils\ArrayHash<mixed> $values */
+    public function process(Form $form, \Nette\Utils\ArrayHash $values): void
     {
         try {
             $this->user->login($values->username, $values->password);

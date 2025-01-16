@@ -30,7 +30,7 @@ final class FilesPresenter extends SecuredPresenter
     }
 
     // TODO: Move to the model
-    public function getRandomCode(int $size, ?string $table = null, ?string $field = null): string|null
+    public function getRandomCode(int $size, ?string $table = null, ?string $field = null): string
     {
         $charlist = '0-9a-z';
 
@@ -45,7 +45,10 @@ final class FilesPresenter extends SecuredPresenter
         for ($counter; $counter < $limit; $counter++) {
             $randomCode = Random::generate($size, $charlist);
             $result = $this->db->query('SELECT * FROM `'.$table.'` WHERE ? = ? LIMIT 1', $field, $randomCode);
-            if(!isset($result) || $result->getRowCount() == 0) break;
+
+            if($result->getRowCount() == 0) {
+                break;
+            }
         }
 
         return ($counter == $limit) ? str_repeat('f', $size) : $randomCode;
@@ -61,8 +64,8 @@ final class FilesPresenter extends SecuredPresenter
         {
             $owner_id = (isset($this->getUser()->id) ? $this->getUser()->id : 0); // CURRENTLY LOGGED USER ID
 
-            $base = $this->getHttpRequest()->url->basePath . 'files';
-            $path = $this->getHttpRequest()->url->path;
+            $base = $this->getHttpRequest()->getUrl()->basePath . 'files';
+            $path = $this->getHttpRequest()->getUrl()->path;
             if (substr($path, 0, strlen($base)) == $base) {
                 $path = substr($path, strlen($base));
             } else { /* ERROR 404 ?? */ }
@@ -122,7 +125,7 @@ final class FilesPresenter extends SecuredPresenter
     }
 
     // Render file list from directory (with sub-directories)
-    public function renderDirectory($path = ''): void
+    public function renderDirectory(string $path = ''): void
     {
         $this->template->treeList = null;
         $this->template->fileList = null;
@@ -223,7 +226,6 @@ final class FilesPresenter extends SecuredPresenter
         if ($resultSel->getRowCount() != 1) {
             $this->flashMessage('CHYBA: Soubor nebyl nalezen, nebo pro jeho stažení nemáte dostatečná oprávnění.', 'danger');
             $this->redirect('Files:default');
-            return;
         }
 
         $data = $resultSel->fetch();
@@ -236,7 +238,6 @@ final class FilesPresenter extends SecuredPresenter
         if (!file_exists($storFile)) {
             $this->flashMessage("CHYBA: Soubor '$baseName' nebyl nalezen.", 'danger');
             $this->redirect('Files:default');
-            return;
         }
 
         header('Content-Description: File Transfer');
@@ -267,7 +268,6 @@ final class FilesPresenter extends SecuredPresenter
         if (empty($storageID_List) || empty($jsonData = json_decode($storageID_List, true))) {
             $this->flashMessage('CHYBA: Soubor nebyl nalezen, nebo nemáte dostatečná oprávnění.', 'danger');
             $this->redirect('Files:default');
-            return;
         }
 
         $basePath = '..' . DIRECTORY_SEPARATOR . 'data';
@@ -283,7 +283,6 @@ final class FilesPresenter extends SecuredPresenter
                 if ($resultSel->getRowCount() != 1) {
                     $this->flashMessage("CHYBA: Soubor (SID: $storageID) nebyl nalezen, nebo pro jeho stažení nemáte dostatečná oprávnění.", 'danger');
                     $this->redirect('Files:default');
-                    return;
                 }
 
                 $data = $resultSel->fetch();
@@ -328,7 +327,6 @@ final class FilesPresenter extends SecuredPresenter
         if ($resultSel->getRowCount() != 1) {
             $this->flashMessage('CHYBA: Soubor nebyl nalezen, nebo pro jeho odstranění nemáte dostatečná oprávnění.', 'danger');
             $this->redirect('Files:default');
-            return;
         }
 
         $data = $resultSel->fetch();
@@ -342,20 +340,17 @@ final class FilesPresenter extends SecuredPresenter
         // if (!file_exists($storFile)) {
         //     $this->flashMessage("CHYBA: Soubor '$baseName' nebyl nalezen.", 'danger');
         //     $this->redirect('Files:default');
-        //     return;
         // }
 
         if (file_exists($storFile) && !unlink($storFile)) {
             $this->flashMessage("CHYBA: Soubor '$baseName' nelze smazat.", 'danger');
             $this->redirect('Files:default');
-            return;
         }
 
         $resultDel = $this->db->query('DELETE FROM storage_files WHERE file_id = ? LIMIT 1', $data->file_id);
         if ($resultDel->getRowCount() != 1) {
             $this->flashMessage("CHYBA: Soubor '$baseName' se nepodařilo odstranit z databáze.", 'danger');
             $this->redirect('Files:default');
-            return;
         }
 
         $this->flashMessage("Soubor '$baseName' byl odstraněn.", 'success'); // TODO: Move files to the recycle bin
@@ -374,7 +369,6 @@ final class FilesPresenter extends SecuredPresenter
         if (empty($jsonData)) {
             $this->flashMessage('CHYBA: Prázdná JSON data.', 'danger');
             $this->redirect('Files:default');
-            return;
         }
 
         $fileCounter = 0;

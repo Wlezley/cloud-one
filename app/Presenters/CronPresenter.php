@@ -16,7 +16,7 @@ class CronPresenter extends BasePresenter
         \Tracy\Debugger::$showBar = false;
     }
 
-    public function actionDefault($hash): void
+    public function actionDefault(string $hash): void
     {
         if ($this->hash == $hash) {
             echo 'OK!';

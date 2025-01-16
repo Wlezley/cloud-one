@@ -17,7 +17,7 @@ class UploadPresenter extends BasePresenter
     }
 
     // BIG FOKIN' TODO: AVOID USING 'echo' (WTF I DOIN' HERE IN THE PAST ???)
-    public function actionDefault($hash): void
+    public function actionDefault(string $hash): void
     {
         if ($hash == '1aerg6384areg651dfb8atr468hzz4ar6t84t541' && isset($_FILES['fileToUpload'])) {
             // $this->template->hash = $hash;

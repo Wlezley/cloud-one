@@ -1,0 +1,24 @@
+parameters:
+    level: 6
+    inferPrivatePropertyTypeFromConstructor: true
+    reportUnmatchedIgnoredErrors: false
+    phpVersion: 80200 # PHP 8.2
+
+    paths:
+        - app
+        - bin
+        - db
+        - www/index.php
+
+    excludePaths:
+        - app/config
+        # - tests
+        - vendor
+
+    # bootstrapFiles:
+    #     - app/phpstan-bootstrap.php
+
+
+# NOTE: This feature requires the phpstan/phpstan-baseline extension. Use the command 'phpstan analyse --generate-baseline' to generate the baseline file.
+# baseline:
+#     path: phpstan-baseline.neon

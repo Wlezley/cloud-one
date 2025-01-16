@@ -66,7 +66,7 @@ class StorageTree extends Storage
             $this->owner_id = $row['owner_id'];
             $this->name = $row['name'];
             $this->name_url = $row['name_url'];
-            $this->date_create = Carbon::create($row['date_create']->format('Y-m-d H:i:s.u'), 'Europe/Prague');
+            // $this->date_create = Carbon::create($row['date_create']->format('Y-m-d H:i:s.u'), 'Europe/Prague'); // ?????????????????????????
             // $this->date_download = Carbon::create($row['date_download']->format('Y-m-d H:i:s.u'), 'Europe/Prague');
             // $this->date_delete = Carbon::create($row['date_delete']->format('Y-m-d H:i:s.u'), 'Europe/Prague');
             // $this->date_modify = Carbon::create($row['date_modify']->format('Y-m-d H:i:s.u'), 'Europe/Prague');
@@ -110,14 +110,14 @@ class StorageTree extends Storage
 
         $result = $this->db->query('INSERT INTO ' . self::TABLE_NAME . ' ?', $data);
 
-        if ($result && $this->db->getInsertId()) {
+        if ($this->db->getInsertId()) {
             return $this->load((int)$this->db->getInsertId());
         }
 
         return $this;
     }
 
-    public function rename(string $name_new): StorageTree
+    public function rename(string $name_new): ?StorageTree
     {
         if (!$this->is_loaded || empty($name_new)) {
             return null;
@@ -178,7 +178,7 @@ class StorageTree extends Storage
 
     // #######################################################################################################
 
-    public function setOwnerID(int $owner_id, bool $save = false)
+    public function setOwnerID(int $owner_id, bool $save = false): void
     {
         $this->owner_id = $owner_id;
 
@@ -187,7 +187,7 @@ class StorageTree extends Storage
         }
     }
 
-    public function setParentID(int $parent_id, bool $save = false)
+    public function setParentID(int $parent_id, bool $save = false): void
     {
         $this->parent_id = $parent_id;
 
@@ -196,7 +196,7 @@ class StorageTree extends Storage
         }
     }
 
-    public function setTreeID(int $tree_id, bool $save = false)
+    public function setTreeID(int $tree_id, bool $save = false): void
     {
         $this->tree_id = $tree_id;
 
@@ -205,7 +205,7 @@ class StorageTree extends Storage
         }
     }
 
-    public function setName(string $name, bool $save = false)
+    public function setName(string $name, bool $save = false): void
     {
         $this->name = $name;
         $this->name_url = \Nette\Utils\Strings::Webalize($name);
@@ -239,7 +239,7 @@ class StorageTree extends Storage
             $path = '/' . $row['name_url'] . $path;
             $tree_id = $row['parent_id'];
         }
-        while ($row['parent_id'] != 0 && $row);
+        while ($row['parent_id'] != 0);
 
         return $path;
     }
@@ -259,7 +259,7 @@ class StorageTree extends Storage
                 $path = '/' . $row['name_url'] . $path;
                 $tree_id = $row['parent_id'];
             }
-            while ($row['parent_id'] != 0 && $row);
+            while ($row['parent_id'] != 0);
         }
 
         return $path;
@@ -303,6 +303,7 @@ class StorageTree extends Storage
     }
 
     // List of sub-folders in the folder
+    /** @return list<array> */
     public function getTreeList(): array
     {
         if (!$this->is_loaded && $this->owner_id == 0) {
@@ -321,6 +322,7 @@ class StorageTree extends Storage
     }
 
     // List of files in the folder
+    /** @return list<array> */
     public function getFileList(): array
     {
         if (!$this->is_loaded && $this->owner_id == 0) {

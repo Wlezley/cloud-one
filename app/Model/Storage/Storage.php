@@ -35,7 +35,7 @@ class Storage
             $randomCode = Random::generate($size, $charlist);
             $result = $this->db->query('SELECT * FROM `'.$table.'` WHERE ? = ? LIMIT 1', $field, $randomCode);
 
-            if (!isset($result) || $result->getRowCount() == 0) {
+            if ($result->getRowCount() == 0) {
                 break;
             }
         }
@@ -43,6 +43,7 @@ class Storage
         return ($counter == $limit) ? str_repeat('f', $size) : $randomCode;
     }
 
+    /** @return array<int,array<string,string>> */
     public function getOwnerList(): array
     {
         $result = $this->db->query('SELECT id,username,fullname,role FROM user_accounts ORDER BY id ASC');

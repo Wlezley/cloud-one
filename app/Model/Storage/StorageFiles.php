@@ -14,7 +14,10 @@ class StorageFiles extends Storage
     public $db;
 
     public int $tree_id;
+
+    /** @var list<array> */
     public array $file_list;
+
     public bool $is_loaded;
 
     public function __construct(Nette\Database\Explorer $db)
